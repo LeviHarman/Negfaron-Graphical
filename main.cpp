@@ -2,6 +2,7 @@
 #include "maps.h"
 #include "map_entity.h"
 
+enum KEYS{UP,DOWN,LEFT,RIGHT};
 vector<vector<Tile>> make_map(int x, int y, string map) {
 
 	vector<vector<Tile>> mv(x, vector<Tile>(y));
@@ -106,6 +107,9 @@ int main(void)
 	int width = 30;  //row x
 	int height = 30; //col y
 	string cur_map;
+	int counter = 0;
+
+	bool keys[4] = {false,false,false,false};
 
 	Entity hero;
 	hero.set_loc(12,15);
@@ -134,9 +138,7 @@ int main(void)
 
 	al_install_audio();
 	al_init_acodec_addon();
-
 	al_reserve_samples(1);
-
 	sample = al_load_sample("collision.ogg");
 
 	timer=al_create_timer(1.0/FPS);
@@ -144,6 +146,7 @@ int main(void)
 
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
+	al_register_event_source(event_queue, al_get_display_event_source(display));
 
 	al_start_timer(timer);
 
@@ -158,6 +161,13 @@ int main(void)
 
 	while(!done)
 	{
+		if (counter<10) {
+			counter++;
+		}
+		else if (counter >=10) {
+			counter=0;
+		}
+
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue,&ev);
 
@@ -167,7 +177,9 @@ int main(void)
 			case ALLEGRO_KEY_UP:
 				facing = 'u';
 				if(mv[hero.hloc-1][hero.wloc].pass == 'y') {
-					hero.hloc-=1;
+					//hero.hloc-=1;
+					counter = 0;
+					keys[UP] = true;
 				}
 				else if(mv[hero.hloc-1][hero.wloc].pass == 'n') {
 					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -176,7 +188,9 @@ int main(void)
 			case ALLEGRO_KEY_DOWN:
 				facing = 'd';
 				if(mv[hero.hloc+1][hero.wloc].pass == 'y') {
-					hero.hloc+=1;
+					//hero.hloc+=1;
+					counter = 0;
+					keys[DOWN]=true;
 				}
 				else if(mv[hero.hloc+1][hero.wloc].pass == 'n') {
 					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -185,7 +199,9 @@ int main(void)
 			case ALLEGRO_KEY_RIGHT:
 				facing = 'r';
 				if(mv[hero.hloc][hero.wloc+1].pass == 'y') {
-					hero.wloc+=1;
+					//hero.wloc+=1;
+					counter = 0;
+					keys[RIGHT]=true;
 				}
 				else if(mv[hero.hloc][hero.wloc+1].pass == 'n') {
 					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -194,7 +210,9 @@ int main(void)
 			case ALLEGRO_KEY_LEFT:
 				facing = 'l';
 				if(mv[hero.hloc][hero.wloc-1].pass == 'y') {
-					hero.wloc-=1;
+					//hero.wloc-=1;
+					counter = 0;
+					keys[LEFT]=true;
 				}
 				else if(mv[hero.hloc][hero.wloc-1].pass == 'n') {
 					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -230,6 +248,70 @@ int main(void)
 			if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
 				done = true;
 			}
+			switch(ev.keyboard.keycode) {
+			case ALLEGRO_KEY_UP:
+				keys[UP] = false;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				keys[DOWN]=false;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				keys[RIGHT]=false;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				keys[LEFT]=false;
+				break;
+			}
+		}
+		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+		{
+			done = true;
+		}
+		if (counter==9) {
+
+			if (keys[UP]==true) {
+				if(mv[hero.hloc-1][hero.wloc].pass == 'y') {
+					//hero.hloc-=1;
+					facing='u';
+					hero.hloc -= keys[UP] * 1 ;
+				}
+				else if(mv[hero.hloc-1][hero.wloc].pass == 'n') {
+					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+				}
+			}
+
+			if (keys[DOWN]==true) {
+				if(mv[hero.hloc+1][hero.wloc].pass == 'y') {
+					//hero.hloc+=1;
+					facing = 'd';
+					hero.hloc += keys[DOWN] * 1;
+				}
+				else if(mv[hero.hloc+1][hero.wloc].pass == 'n') {
+					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+				}
+			}
+
+			if (keys[LEFT] == true) {
+				if(mv[hero.hloc][hero.wloc-1].pass == 'y') {
+					//hero.wloc-=1;
+					facing = 'l';
+					hero.wloc -= keys[LEFT] * 1 ;
+				}
+				else if(mv[hero.hloc][hero.wloc-1].pass == 'n') {
+					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+				}
+			}
+
+			if (keys[RIGHT] == true) {
+				if(mv[hero.hloc][hero.wloc+1].pass == 'y') {
+					//hero.wloc+=1;
+					facing = 'r';
+					hero.wloc += keys[RIGHT] * 1;
+				}
+				else if(mv[hero.hloc][hero.wloc+1].pass == 'n') {
+					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+				}
+			}
 		}
 
 		//CHECK FOR ON STEP EVENT################################################################################################
@@ -259,21 +341,20 @@ int main(void)
 		
 		switch (facing) {
 		case 'u':
-			al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, hero.hloc*16, 0);
+			al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
 			break;
 		case 'd':
-			al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16, 0);
+			al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
 			break;
 		case 'l':
-			al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16, hero.hloc*16, 0);
+			al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
 			break;
 		case 'r':
-			al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16, hero.hloc*16, 0);
+			al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
 			break;
 		}		
 
 		al_flip_display();
-		al_clear_to_color(al_map_rgb(0,0,0));
 	}
 
 	al_destroy_display(display);

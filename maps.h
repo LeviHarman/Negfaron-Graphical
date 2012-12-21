@@ -1,4 +1,4 @@
-//Home map
+//HOME - outside of your home. your homeland.
 void init_map_home(string &cur_map, vector<vector<Entity>> &mve) {
 
  cur_map = 
@@ -34,7 +34,7 @@ void init_map_home(string &cur_map, vector<vector<Entity>> &mve) {
 		"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
 }
 
-//House map
+//HOUSE - inside your house.
 void init_map_house(string &cur_map, vector<vector<Entity>> &mve) {
  cur_map = 
 		"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
@@ -67,5 +67,4 @@ void init_map_house(string &cur_map, vector<vector<Entity>> &mve) {
 		"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
 		"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
 		"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV";
- //rug 18 down 15 over
 }
