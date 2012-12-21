@@ -170,27 +170,51 @@ int main(void)
 			switch(ev.keyboard.keycode) {
 
 			case ALLEGRO_KEY_UP:
-				facing = 'u';
-				keys[UP] = true;
-				if (hero.can_pass(facing,mv,hero)) {
-					move_animation = true; //start animation
+				if (move_animation == false) {
+					facing = 'u';
+					keys[UP] = true;
+				
+					if (hero.can_pass(facing,mv,hero)) {
+						move_animation = true; //start animation
+					}
+					frame = 1;
 				}
-				frame = 1;
 				break;
 
 			case ALLEGRO_KEY_DOWN:
-				facing = 'd';
-				keys[DOWN]=true;
+				if (move_animation == false) {
+					facing = 'd';
+					keys[DOWN]=true;
+				
+					if (hero.can_pass(facing,mv,hero)) {
+						move_animation = true; //start animation
+					}
+					frame = 1;
+				}
 				break;
 
 			case ALLEGRO_KEY_RIGHT:
-				facing = 'r';
-				keys[RIGHT]=true;
+				if(move_animation == false) {
+					facing = 'r';
+					keys[RIGHT]=true;
+
+					if (hero.can_pass(facing,mv,hero)) {
+						move_animation = true;
+					}
+					frame = 1;
+				}
 				break;
 
 			case ALLEGRO_KEY_LEFT:
-				facing = 'l';
-				keys[LEFT]=true;
+				if(move_animation==false) {
+					facing = 'l';
+					keys[LEFT]=true;
+
+					if(hero.can_pass(facing,mv,hero)) {
+						move_animation = true;
+					}
+					frame = 1;
+				}
 				break;
 
 			case ALLEGRO_KEY_Z:
@@ -250,20 +274,26 @@ int main(void)
 					move_animation = true;
 				}
 			}	
-		}/*
-		else if (keys[DOWN]==true) {
-			if (hero.can_pass(facing,mv,hero))
-				hero.hloc += 1 ; 
+			else if (keys[DOWN]==true) {
+				if (hero.can_pass(facing,mv,hero)) {
+					frame = 1;
+					move_animation = true;
+				}
+			}
+			else if (keys[LEFT] == true) {
+				if (hero.can_pass(facing,mv,hero)) {
+					frame = 1;
+					move_animation = true;
+				}		
+			}
+			else if (keys[RIGHT] == true) {
+				if (hero.can_pass(facing,mv,hero)) {
+					frame = 1;
+					move_animation = true;
+				}
+			}
 		}
-		else if (keys[LEFT] == true) {
-			if (hero.can_pass(facing,mv,hero))
-				hero.wloc -= 1 ;
-		}
-		else if (keys[RIGHT] == true) {
-			if (hero.can_pass(facing,mv,hero))
-				hero.wloc += 1 ;
-		}
-		*/
+
 		//CHECK FOR ON STEP EVENT################################################################################################
 		if(mve[hero.hloc][hero.wloc].step_on == 'y') {
 			if (mve[hero.hloc][hero.wloc].map_warp == "house") {
@@ -308,13 +338,49 @@ int main(void)
 			}
 			break;
 		case 'd':
-			al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+			if(move_animation==true) {
+				if(hero.can_pass(facing,mv,hero)) {
+					al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+frame*2, 0);
+					if(frame==7) {
+						move_animation = false;
+						hero.hloc+=1;
+					}
+				}
+				frame++;
+			}
+			else {
+				al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+			}
 			break;
 		case 'l':
-			al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+			if(move_animation==true) {
+				if(hero.can_pass(facing,mv,hero)) {
+					al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16-frame*2, hero.hloc*16-4, 0);
+				}
+				if(frame==7) {
+					move_animation = false;
+					hero.wloc-=1;
+				}
+				frame++;
+			}
+			else {
+				al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+			}
 			break;
 		case 'r':
-			al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+			if(move_animation==true) {
+				if(hero.can_pass(facing,mv,hero)) {
+					al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16+frame*2, hero.hloc*16-4, 0);
+				}
+				if(frame==7) {
+					move_animation = false;
+					hero.wloc+=1;
+				}
+				frame++;
+			}
+			else {
+				al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+			}
 			break;
 		}		
 
