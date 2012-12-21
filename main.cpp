@@ -107,7 +107,8 @@ int main(void)
 	int width = 30;  //row x
 	int height = 30; //col y
 	string cur_map;
-	int counter = 0;
+	bool move_animation = false;
+	int frame;
 
 	bool keys[4] = {false,false,false,false};
 
@@ -161,63 +162,37 @@ int main(void)
 
 	while(!done)
 	{
-		if (counter<10) {
-			counter++;
-		}
-		else if (counter >=10) {
-			counter=0;
-		}
-
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue,&ev);
 
 		if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
 			switch(ev.keyboard.keycode) {
+
 			case ALLEGRO_KEY_UP:
 				facing = 'u';
-				if(mv[hero.hloc-1][hero.wloc].pass == 'y') {
-					//hero.hloc-=1;
-					counter = 0;
-					keys[UP] = true;
+				keys[UP] = true;
+				if (hero.can_pass(facing,mv,hero)) {
+					move_animation = true; //start animation
 				}
-				else if(mv[hero.hloc-1][hero.wloc].pass == 'n') {
-					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-				}
+				frame = 1;
 				break;
+
 			case ALLEGRO_KEY_DOWN:
 				facing = 'd';
-				if(mv[hero.hloc+1][hero.wloc].pass == 'y') {
-					//hero.hloc+=1;
-					counter = 0;
-					keys[DOWN]=true;
-				}
-				else if(mv[hero.hloc+1][hero.wloc].pass == 'n') {
-					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-				}
+				keys[DOWN]=true;
 				break;
+
 			case ALLEGRO_KEY_RIGHT:
 				facing = 'r';
-				if(mv[hero.hloc][hero.wloc+1].pass == 'y') {
-					//hero.wloc+=1;
-					counter = 0;
-					keys[RIGHT]=true;
-				}
-				else if(mv[hero.hloc][hero.wloc+1].pass == 'n') {
-					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-				}
+				keys[RIGHT]=true;
 				break;
+
 			case ALLEGRO_KEY_LEFT:
 				facing = 'l';
-				if(mv[hero.hloc][hero.wloc-1].pass == 'y') {
-					//hero.wloc-=1;
-					counter = 0;
-					keys[LEFT]=true;
-				}
-				else if(mv[hero.hloc][hero.wloc-1].pass == 'n') {
-					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-				}
+				keys[LEFT]=true;
 				break;
+
 			case ALLEGRO_KEY_Z:
 				switch(facing) {
 				case 'u':
@@ -242,6 +217,7 @@ int main(void)
 					break;
 				break;
 				}
+
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
@@ -267,53 +243,27 @@ int main(void)
 		{
 			done = true;
 		}
-		if (counter==9) {
-
+		if (move_animation == false) {
 			if (keys[UP]==true) {
-				if(mv[hero.hloc-1][hero.wloc].pass == 'y') {
-					//hero.hloc-=1;
-					facing='u';
-					hero.hloc -= keys[UP] * 1 ;
+				if (hero.can_pass(facing,mv,hero)) {
+					frame = 1;
+					move_animation = true;
 				}
-				else if(mv[hero.hloc-1][hero.wloc].pass == 'n') {
-					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-				}
-			}
-
-			if (keys[DOWN]==true) {
-				if(mv[hero.hloc+1][hero.wloc].pass == 'y') {
-					//hero.hloc+=1;
-					facing = 'd';
-					hero.hloc += keys[DOWN] * 1;
-				}
-				else if(mv[hero.hloc+1][hero.wloc].pass == 'n') {
-					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-				}
-			}
-
-			if (keys[LEFT] == true) {
-				if(mv[hero.hloc][hero.wloc-1].pass == 'y') {
-					//hero.wloc-=1;
-					facing = 'l';
-					hero.wloc -= keys[LEFT] * 1 ;
-				}
-				else if(mv[hero.hloc][hero.wloc-1].pass == 'n') {
-					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-				}
-			}
-
-			if (keys[RIGHT] == true) {
-				if(mv[hero.hloc][hero.wloc+1].pass == 'y') {
-					//hero.wloc+=1;
-					facing = 'r';
-					hero.wloc += keys[RIGHT] * 1;
-				}
-				else if(mv[hero.hloc][hero.wloc+1].pass == 'n') {
-					al_play_sample(sample, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-				}
-			}
+			}	
+		}/*
+		else if (keys[DOWN]==true) {
+			if (hero.can_pass(facing,mv,hero))
+				hero.hloc += 1 ; 
 		}
-
+		else if (keys[LEFT] == true) {
+			if (hero.can_pass(facing,mv,hero))
+				hero.wloc -= 1 ;
+		}
+		else if (keys[RIGHT] == true) {
+			if (hero.can_pass(facing,mv,hero))
+				hero.wloc += 1 ;
+		}
+		*/
 		//CHECK FOR ON STEP EVENT################################################################################################
 		if(mve[hero.hloc][hero.wloc].step_on == 'y') {
 			if (mve[hero.hloc][hero.wloc].map_warp == "house") {
@@ -339,9 +289,23 @@ int main(void)
 			}
 		}
 		
+
+
 		switch (facing) {
 		case 'u':
-			al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+			if(move_animation==true) {
+				if (hero.can_pass(facing,mv,hero)) {
+					al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-frame*2, 0);
+					if(frame == 7) {
+						move_animation = false;
+						hero.hloc-=1;
+					}
+				}
+				frame++;
+			}
+			else {
+				al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+			}
 			break;
 		case 'd':
 			al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
