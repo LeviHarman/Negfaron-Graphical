@@ -1,7 +1,6 @@
 #include "main.h"
 #include "maps.h"
-
-//al_draw_bitmap_region(image, sx * 16, sy * 16, 16, 16, x, y, 0);
+#include "map_entity.h"
 
 vector<vector<Tile>> make_map(int x, int y, string map) {
 
@@ -152,11 +151,7 @@ int main(void)
 	init_map_house(cur_map, mve);
 	vector<vector<Tile>> mv = make_map(height,width,cur_map);
 
-	Entity rug;
-	rug.set_warp("home");
-	rug.set_hero_loc(16,9);
-	mve[17][15] = rug;
-	mve[17][16] = rug;
+	init_map_house_entity(mve);
 
 	tileset = al_load_bitmap("tileset.png");
 	al_convert_mask_to_alpha(tileset, al_map_rgb(0,255,255));
@@ -209,22 +204,22 @@ int main(void)
 				switch(facing) {
 				case 'u':
 					if(mve[hero.hloc-1][hero.wloc].interact == 'y') {
-						cout<<"Welcome to Negfaron!";
+						cout<<mve[hero.hloc-1][hero.wloc].dialogue;
 					}
 					break;
 				case 'd':
 					if(mve[hero.hloc+1][hero.wloc].interact == 'y') {
-						cout<<"Welcome to Negfaron!";
+						cout<<mve[hero.hloc+1][hero.wloc].dialogue;
 					}
 					break;
 				case 'l':
 					if(mve[hero.hloc][hero.wloc-1].interact == 'y') {
-						cout<<"Welcome to Negfaron!";
+						cout<<mve[hero.hloc][hero.wloc-1].dialogue;
 					}
 					break;
 				case 'r':
 					if(mve[hero.hloc][hero.wloc+1].interact == 'y') {
-						cout<<"Welcome to Negfaron!";
+						cout<<mve[hero.hloc][hero.wloc+1].dialogue;
 					}
 					break;
 				break;
@@ -237,52 +232,25 @@ int main(void)
 			}
 		}
 
-		//check for step_on event
+		//CHECK FOR ON STEP EVENT################################################################################################
 		if(mve[hero.hloc][hero.wloc].step_on == 'y') {
-			//vector<vector<Entity>> mve(width, vector<Entity>(height));
 			if (mve[hero.hloc][hero.wloc].map_warp == "house") {
 				hero.set_loc(mve[hero.hloc][hero.wloc].warp_col,mve[hero.hloc][hero.wloc].warp_row);
-				for (int i=0;i<30;i++){
-					for (int j = 0;j<30;j++) {
-					mve[i][j].cleanup();
-					}
-				}
-
-				Entity rug;
-				rug.set_warp("home");
-				rug.set_hero_loc(16,9);
-				mve[17][15] = rug;
-				mve[17][16] = rug;
-
+				init_map_entity_cleanup(mve);
+				init_map_house_entity(mve);
 				init_map_house(cur_map,mve);
 				mv = make_map(height,width,cur_map);
 			}
-
 			else if (mve[hero.hloc][hero.wloc].map_warp == "home") {
 				hero.set_loc(mve[hero.hloc][hero.wloc].warp_col,mve[hero.hloc][hero.wloc].warp_row);
-				
-
-				for (int i=0;i<30;i++){
-					for (int j = 0;j<30;j++) {
-					mve[i][j].cleanup();
-					}
-				}
-
- 				Entity sign;
-				sign.entity_event("Hello, entity event is working.");
-				mve[2][7] = sign; //2 down one over
-		
-				Entity door;
-				door.set_warp("house");
-				door.set_hero_loc(16,15);
-				mve[15][9] = door;
-
+				init_map_entity_cleanup(mve);
+				init_map_home_entity(mve);
 				init_map_home(cur_map,mve);
 				mv = make_map(height,width,cur_map);
 			}
 		}
 
-		//draw map
+		//DRAW MAP################################################################################################################
 		for(int col=0;col<height;col++) {
 			for(int row=0;row<width;row++) {
 				al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, row*16, col*16, 0);
