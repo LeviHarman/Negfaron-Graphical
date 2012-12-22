@@ -36,6 +36,7 @@ public:
 	void set_hero_loc(int,int);
 	void cleanup ();
 	bool can_pass(char,vector<vector<Tile>>,Entity);
+	bool action_button; 
 };
 
 void Entity::cleanup() {
@@ -47,6 +48,7 @@ void Entity::cleanup() {
 	interact = NULL;
 	step_on=NULL;
 	facing = NULL;
+	move_animation = NULL;
 }
 
 bool Entity::can_pass(char dir, vector<vector<Tile>> mv,Entity hero) {
