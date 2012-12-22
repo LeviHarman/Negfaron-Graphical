@@ -29,6 +29,7 @@ public:
 	int warp_row, warp_col;
 	char interact,step_on,facing;
 	string dialogue,map_warp;
+	bool move_animation;
 	void set_loc(int,int);
 	void entity_event(string);
 	void set_warp(string);
