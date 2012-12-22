@@ -2,7 +2,7 @@
 vector<vector<Entity>> init_map_house_entity(vector<vector<Entity>> &mve) {
 	Entity rug;
 	rug.set_warp("home");
-	rug.set_hero_loc(16,9);
+	rug.set_hero_loc(5,9);
 	mve[17][15] = rug;
 	mve[17][16] = rug;
 
@@ -13,12 +13,12 @@ vector<vector<Entity>> init_map_house_entity(vector<vector<Entity>> &mve) {
 vector<vector<Entity>> init_map_home_entity(vector<vector<Entity>> &mve) {
  	Entity sign;
 	sign.entity_event("Hello, entity event is working.");
-	mve[2][7] = sign; //2 down one over
+	mve[22][5] = sign;
 		
 	Entity door;
 	door.set_warp("house");
 	door.set_hero_loc(16,15);
-	mve[15][9] = door;
+	mve[4][9] = door;
 
 	return mve;
 }
