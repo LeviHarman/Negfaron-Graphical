@@ -111,14 +111,13 @@ int main(void)
 
 	//primitive variables
 	bool done = false;
-	//bool move_animation = false;
 	bool keys[4] = {false,false,false,false};
 	bool redraw = false;
 
 	//integer variables
 	int width = 30;  //row x
 	int height = 30; //col y
-	int FPS = 30;
+	int FPS = 60;
 
 	//string variables
 	string cur_map;
@@ -174,55 +173,18 @@ int main(void)
 		if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
 			switch(ev.keyboard.keycode) {
-
 			case ALLEGRO_KEY_UP:
-				if (hero.move_animation == false) {
-					hero.facing = 'u';
-					keys[UP] = true;
-				
-					if (hero.can_pass(hero.facing,mv,hero)) {
-						hero.move_animation = true; //start animation
-					}
-					hero.frame = 1;
-				}
+				keys[UP] = true;
 				break;
-
 			case ALLEGRO_KEY_DOWN:
-				if (hero.move_animation == false) {
-					hero.facing = 'd';
-					keys[DOWN]=true;
-				
-					if (hero.can_pass(hero.facing,mv,hero)) {
-						hero.move_animation = true; //start animation
-					}
-					hero.frame = 1;
-				}
+				keys[DOWN]=true;
 				break;
-
 			case ALLEGRO_KEY_RIGHT:
-				if(hero.move_animation == false) {
-					hero.facing = 'r';
-					keys[RIGHT]=true;
-
-					if (hero.can_pass(hero.facing,mv,hero)) {
-						hero.move_animation = true;
-					}
-					hero.frame = 1;
-				}
+				keys[RIGHT]=true;
 				break;
-
 			case ALLEGRO_KEY_LEFT:
-				if(hero.move_animation==false) {
-					hero.facing = 'l';
-					keys[LEFT]=true;
-
-					if(hero.can_pass(hero.facing,mv,hero)) {
-						hero.move_animation = true;
-					}
-					hero.frame = 1;
-				}
+				keys[LEFT]=true;
 				break;
-
 			case ALLEGRO_KEY_Z:
 				switch(hero.facing) {
 				case 'u':
@@ -247,13 +209,16 @@ int main(void)
 					break;
 				break;
 				}
-
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
+
+			//end game
 			if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
 				done = true;
 			}
+
+			//keys no longer held down.
 			switch(ev.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
 				keys[UP] = false;
@@ -273,26 +238,32 @@ int main(void)
 		{
 			done = true;
 		}
+
+		//WAIT UNTIL ANIMATION IS OVER - If key is still pressed animate again. (Pokemon esque)
 		if (hero.move_animation == false) {
 			if (keys[UP]==true) {
+				hero.facing = 'u';
 				if (hero.can_pass(hero.facing,mv,hero)) {
 					hero.frame = 1;
 					hero.move_animation = true;
 				}
 			}	
 			else if (keys[DOWN]==true) {
+				hero.facing = 'd';
 				if (hero.can_pass(hero.facing,mv,hero)) {
 					hero.frame = 1;
 					hero.move_animation = true;
 				}
 			}
 			else if (keys[LEFT] == true) {
+				hero.facing = 'l';
 				if (hero.can_pass(hero.facing,mv,hero)) {
 					hero.frame = 1;
 					hero.move_animation = true;
 				}		
 			}
 			else if (keys[RIGHT] == true) {
+				hero.facing = 'r';
 				if (hero.can_pass(hero.facing,mv,hero)) {
 					hero.frame = 1;
 					hero.move_animation = true;
