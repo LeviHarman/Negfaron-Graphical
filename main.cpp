@@ -6,7 +6,6 @@ enum KEYS{UP,DOWN,LEFT,RIGHT};
 vector<vector<Tile>> make_map(int x, int y, string map) {
 
 	vector<vector<Tile>> mv(x, vector<Tile>(y));
-
 	int counter = 0;
 
 	for(int i=0;i<x;i++) {
@@ -103,27 +102,23 @@ vector<vector<Tile>> make_map(int x, int y, string map) {
 
 int main(void)
 {
+	ALLEGRO_DISPLAY* display = NULL;
+	ALLEGRO_EVENT_QUEUE* event_queue=NULL;
+	ALLEGRO_TIMER* timer=NULL;
+	ALLEGRO_BITMAP *tileset = NULL;
+	ALLEGRO_SAMPLE *sample;
 	bool done = false;
 	int width = 30;  //row x
 	int height = 30; //col y
 	string cur_map;
 	bool move_animation = false;
 	int frame;
-
 	bool keys[4] = {false,false,false,false};
-
 	Entity hero;
 	hero.set_loc(12,15);
-
-	int FPS = 10;
-	
+	int FPS = 30;
 	char facing = 'd';
-
-	ALLEGRO_DISPLAY* display = NULL;
-	ALLEGRO_EVENT_QUEUE* event_queue=NULL;
-	ALLEGRO_TIMER* timer=NULL;
-	ALLEGRO_BITMAP *tileset = NULL;
-	ALLEGRO_SAMPLE *sample;
+	bool redraw = false;
 
 	if(!al_init())												//initialize allegro
 		return -1;
@@ -164,7 +159,10 @@ int main(void)
 	{
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue,&ev);
-
+		
+		if(ev.type == ALLEGRO_EVENT_TIMER){
+			redraw = true;
+		}
 		if(ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
 			switch(ev.keyboard.keycode) {
@@ -312,79 +310,84 @@ int main(void)
 			}
 		}
 
-		//DRAW MAP################################################################################################################
-		for(int col=0;col<height;col++) {
-			for(int row=0;row<width;row++) {
-				al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, row*16, col*16, 0);
-			}
+		if(redraw && al_is_event_queue_empty(event_queue))
+		{
+			cout<<"frame";
+			redraw = false;
+
+			//DRAW MAP################################################################################################################
+			for(int col=0;col<height;col++) {
+				for(int row=0;row<width;row++) {
+					al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, row*16, col*16, 0);
+				}
+			}	
+
+			switch (facing) {
+			case 'u':
+				if(move_animation==true) {
+					if (hero.can_pass(facing,mv,hero)) {
+						al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-frame, 0);
+						if(frame == 15) {
+							move_animation = false;
+							hero.hloc-=1;
+						}
+					}
+					frame++;
+				}
+				else {
+					al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+				}
+				break;
+			case 'd':
+				if(move_animation==true) {
+					if(hero.can_pass(facing,mv,hero)) {
+						al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+frame, 0);
+						if(frame==15) {
+							move_animation = false;
+							hero.hloc+=1;
+						}
+					}
+					frame++;
+				}
+				else {
+					al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+				}
+				break;
+			case 'l':
+				if(move_animation==true) {
+					if(hero.can_pass(facing,mv,hero)) {
+						al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16-frame, hero.hloc*16-4, 0);
+					}
+					if(frame==15) {
+						move_animation = false;
+						hero.wloc-=1;
+					}
+					frame++;
+				}
+				else {
+					al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+				}
+				break;
+			case 'r':
+				if(move_animation==true) {
+					if(hero.can_pass(facing,mv,hero)) {
+						al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16+frame, hero.hloc*16-4, 0);
+					}
+					if(frame==15) {
+						move_animation = false;
+						hero.wloc+=1;
+					}
+					frame++;
+				}
+				else {
+					al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+				}
+				break;
+			}	
+
+			al_flip_display();
+			al_clear_to_color(al_map_rgb(0,0,0));
 		}
-		
-
-
-		switch (facing) {
-		case 'u':
-			if(move_animation==true) {
-				if (hero.can_pass(facing,mv,hero)) {
-					al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-frame*2, 0);
-					if(frame == 7) {
-						move_animation = false;
-						hero.hloc-=1;
-					}
-				}
-				frame++;
-			}
-			else {
-				al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
-			}
-			break;
-		case 'd':
-			if(move_animation==true) {
-				if(hero.can_pass(facing,mv,hero)) {
-					al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+frame*2, 0);
-					if(frame==7) {
-						move_animation = false;
-						hero.hloc+=1;
-					}
-				}
-				frame++;
-			}
-			else {
-				al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
-			}
-			break;
-		case 'l':
-			if(move_animation==true) {
-				if(hero.can_pass(facing,mv,hero)) {
-					al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16-frame*2, hero.hloc*16-4, 0);
-				}
-				if(frame==7) {
-					move_animation = false;
-					hero.wloc-=1;
-				}
-				frame++;
-			}
-			else {
-				al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
-			}
-			break;
-		case 'r':
-			if(move_animation==true) {
-				if(hero.can_pass(facing,mv,hero)) {
-					al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16+frame*2, hero.hloc*16-4, 0);
-				}
-				if(frame==7) {
-					move_animation = false;
-					hero.wloc+=1;
-				}
-				frame++;
-			}
-			else {
-				al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
-			}
-			break;
-		}		
-
-		al_flip_display();
 	}
 
 	al_destroy_display(display);
