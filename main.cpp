@@ -102,59 +102,66 @@ vector<vector<Tile>> make_map(int x, int y, string map) {
 
 int main(void)
 {
+	//Allegro variables
 	ALLEGRO_DISPLAY* display = NULL;
 	ALLEGRO_EVENT_QUEUE* event_queue=NULL;
 	ALLEGRO_TIMER* timer=NULL;
 	ALLEGRO_BITMAP *tileset = NULL;
 	ALLEGRO_SAMPLE *sample;
+
+	//primitive variables
 	bool done = false;
-	int width = 30;  //row x
-	int height = 30; //col y
-	string cur_map;
 	bool move_animation = false;
-	int frame;
 	bool keys[4] = {false,false,false,false};
-	Entity hero;
-	hero.set_loc(12,15);
-	int FPS = 30;
-	char facing = 'd';
 	bool redraw = false;
 
-	if(!al_init())												//initialize allegro
+	//integer variables
+	int width = 30;  //row x
+	int height = 30; //col y
+	int FPS = 30;
+
+	//string variables
+	string cur_map;
+	
+	//Object variables
+	Entity hero;
+	hero.set_loc(12,15);
+	hero.facing = 'd';
+	
+	if(!al_init())
 		return -1;
 
-	display = al_create_display((width*16)-1,(height*16)-1);	//create our display object
+	display = al_create_display((width*16)-1,(height*16)-1);
 
-	if(!display)												//test display object
+	if(!display)
 		return -1;
 
+	//Allegro module init
 	al_install_keyboard();
 	al_init_primitives_addon();
 	al_init_image_addon();
-
 	al_install_audio();
 	al_init_acodec_addon();
 	al_reserve_samples(1);
-	sample = al_load_sample("collision.ogg");
 
+	sample = al_load_sample("collision.ogg");
 	timer=al_create_timer(1.0/FPS);
 	event_queue = al_create_event_queue();
 
+	//game init
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 
 	al_start_timer(timer);
-
 	vector<vector<Entity>> mve(width, vector<Entity>(height));
 	init_map_house(cur_map, mve);
 	vector<vector<Tile>> mv = make_map(height,width,cur_map);
-
 	init_map_house_entity(mve);
-
 	tileset = al_load_bitmap("tileset.png");
 	al_convert_mask_to_alpha(tileset, al_map_rgb(0,255,255));
 
+	//game loop
 	while(!done)
 	{
 		ALLEGRO_EVENT ev;
@@ -169,54 +176,54 @@ int main(void)
 
 			case ALLEGRO_KEY_UP:
 				if (move_animation == false) {
-					facing = 'u';
+					hero.facing = 'u';
 					keys[UP] = true;
 				
-					if (hero.can_pass(facing,mv,hero)) {
+					if (hero.can_pass(hero.facing,mv,hero)) {
 						move_animation = true; //start animation
 					}
-					frame = 1;
+					hero.frame = 1;
 				}
 				break;
 
 			case ALLEGRO_KEY_DOWN:
 				if (move_animation == false) {
-					facing = 'd';
+					hero.facing = 'd';
 					keys[DOWN]=true;
 				
-					if (hero.can_pass(facing,mv,hero)) {
+					if (hero.can_pass(hero.facing,mv,hero)) {
 						move_animation = true; //start animation
 					}
-					frame = 1;
+					hero.frame = 1;
 				}
 				break;
 
 			case ALLEGRO_KEY_RIGHT:
 				if(move_animation == false) {
-					facing = 'r';
+					hero.facing = 'r';
 					keys[RIGHT]=true;
 
-					if (hero.can_pass(facing,mv,hero)) {
+					if (hero.can_pass(hero.facing,mv,hero)) {
 						move_animation = true;
 					}
-					frame = 1;
+					hero.frame = 1;
 				}
 				break;
 
 			case ALLEGRO_KEY_LEFT:
 				if(move_animation==false) {
-					facing = 'l';
+					hero.facing = 'l';
 					keys[LEFT]=true;
 
-					if(hero.can_pass(facing,mv,hero)) {
+					if(hero.can_pass(hero.facing,mv,hero)) {
 						move_animation = true;
 					}
-					frame = 1;
+					hero.frame = 1;
 				}
 				break;
 
 			case ALLEGRO_KEY_Z:
-				switch(facing) {
+				switch(hero.facing) {
 				case 'u':
 					if(mve[hero.hloc-1][hero.wloc].interact == 'y') {
 						cout<<mve[hero.hloc-1][hero.wloc].dialogue;
@@ -267,26 +274,26 @@ int main(void)
 		}
 		if (move_animation == false) {
 			if (keys[UP]==true) {
-				if (hero.can_pass(facing,mv,hero)) {
-					frame = 1;
+				if (hero.can_pass(hero.facing,mv,hero)) {
+					hero.frame = 1;
 					move_animation = true;
 				}
 			}	
 			else if (keys[DOWN]==true) {
-				if (hero.can_pass(facing,mv,hero)) {
-					frame = 1;
+				if (hero.can_pass(hero.facing,mv,hero)) {
+					hero.frame = 1;
 					move_animation = true;
 				}
 			}
 			else if (keys[LEFT] == true) {
-				if (hero.can_pass(facing,mv,hero)) {
-					frame = 1;
+				if (hero.can_pass(hero.facing,mv,hero)) {
+					hero.frame = 1;
 					move_animation = true;
 				}		
 			}
 			else if (keys[RIGHT] == true) {
-				if (hero.can_pass(facing,mv,hero)) {
-					frame = 1;
+				if (hero.can_pass(hero.facing,mv,hero)) {
+					hero.frame = 1;
 					move_animation = true;
 				}
 			}
@@ -322,17 +329,17 @@ int main(void)
 				}
 			}	
 
-			switch (facing) {
+			switch (hero.facing) {
 			case 'u':
 				if(move_animation==true) {
-					if (hero.can_pass(facing,mv,hero)) {
-						al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-frame, 0);
-						if(frame == 15) {
+					if (hero.can_pass(hero.facing,mv,hero)) {
+						al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-hero.frame, 0);
+						if(hero.frame == 15) {
 							move_animation = false;
 							hero.hloc-=1;
 						}
 					}
-					frame++;
+					hero.frame++;
 				}
 				else {
 					al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
@@ -340,14 +347,14 @@ int main(void)
 				break;
 			case 'd':
 				if(move_animation==true) {
-					if(hero.can_pass(facing,mv,hero)) {
-						al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+frame, 0);
-						if(frame==15) {
+					if(hero.can_pass(hero.facing,mv,hero)) {
+						al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+hero.frame, 0);
+						if(hero.frame==15) {
 							move_animation = false;
 							hero.hloc+=1;
 						}
 					}
-					frame++;
+					hero.frame++;
 				}
 				else {
 					al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
@@ -355,14 +362,14 @@ int main(void)
 				break;
 			case 'l':
 				if(move_animation==true) {
-					if(hero.can_pass(facing,mv,hero)) {
-						al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16-frame, hero.hloc*16-4, 0);
+					if(hero.can_pass(hero.facing,mv,hero)) {
+						al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16-hero.frame, hero.hloc*16-4, 0);
 					}
-					if(frame==15) {
+					if(hero.frame==15) {
 						move_animation = false;
 						hero.wloc-=1;
 					}
-					frame++;
+					hero.frame++;
 				}
 				else {
 					al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
@@ -370,14 +377,14 @@ int main(void)
 				break;
 			case 'r':
 				if(move_animation==true) {
-					if(hero.can_pass(facing,mv,hero)) {
-						al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16+frame, hero.hloc*16-4, 0);
+					if(hero.can_pass(hero.facing,mv,hero)) {
+						al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16+hero.frame, hero.hloc*16-4, 0);
 					}
-					if(frame==15) {
+					if(hero.frame==15) {
 						move_animation = false;
 						hero.wloc+=1;
 					}
-					frame++;
+					hero.frame++;
 				}
 				else {
 					al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);

@@ -25,7 +25,7 @@ void Tile::set_values(char cid1,char pass1,int sy1,int sx1) {
 
 class Entity {
 public:
-	int wloc, hloc;
+	int wloc, hloc, frame;
 	int warp_row, warp_col;
 	char interact,step_on,facing;
 	string dialogue,map_warp;
@@ -40,6 +40,7 @@ public:
 void Entity::cleanup() {
 	wloc = NULL;
 	hloc = NULL;
+	frame = NULL;
 	warp_row=NULL;
 	warp_col=NULL;
 	interact = NULL;
