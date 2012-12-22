@@ -101,6 +101,31 @@ vector<vector<Tile>> make_map(int x, int y, string map) {
 	return mv;
 }
 
+static void get_fps(int *average, int *minmax)
+{
+   int i;
+   int prev = FPS - 1;
+   double min_dt = 1;
+   double max_dt = 1 / 1000000.0;
+   double av = 0;
+   double d;
+   for (i = 0; i < FPS; i++) {
+      if (i != example.ftpos) {
+         double dt = example.frame_times[i] - example.frame_times[prev];
+         if (dt < min_dt)
+            min_dt = dt;
+         if (dt > max_dt)
+            max_dt = dt;
+         av += dt;
+      }
+      prev = i;
+   }
+   av /= (FPS - 1);
+   *average = ceil(1 / av);
+   d = 1 / min_dt - 1 / max_dt;
+   *minmax = floor(d / 2);
+}
+
 int main(void)
 {
 	bool done = false;
@@ -109,6 +134,7 @@ int main(void)
 	string cur_map;
 	bool move_animation = false;
 	int frame;
+	int f1,f2;
 
 	bool keys[4] = {false,false,false,false};
 
