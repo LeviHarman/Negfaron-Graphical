@@ -1,104 +1,9 @@
 #include "main.h"
 #include "maps.h"
 #include "map_entity.h"
+#include "make_map.h"
 
 enum KEYS{UP,DOWN,LEFT,RIGHT};
-vector<vector<Tile>> make_map(int x, int y, string map) {
-
-	vector<vector<Tile>> mv(x, vector<Tile>(y));
-	int counter = 0;
-
-	for(int i=0;i<x;i++) {
-		for(int j=0;j<y;j++) {
-			switch(map[counter]) {
-			case 'X'://Wooden log
-				mv[i][j].set_values('x','n',0,0);
-				break;
-			case 'O' ://empty
-				mv[i][j].set_values('o','y',1,3);
-				break;
-			case 'V': //the void
-				mv[i][j].set_values('v','n',2,4);
-				break;
-			case 'G'://grass (long)
-				mv[i][j].set_values('g','y',1,1);
-				break;
-			case 'T'://tree
-				mv[i][j].set_values('t','n',0,2);
-				break;
-			case 'S'://sign
-				mv[i][j].set_values('s','n',0,3);
-				break;
-			case 'B'://blood
-				mv[i][j].set_values('b','y',1,4);
-				break;
-			case 'D': //dirt
-				mv[i][j].set_values('d','y',2,3);
-				break;
-			case 'W': //dirt
-				mv[i][j].set_values('w','y',4,3);
-				break;
-			case 'F': //floor
-				mv[i][j].set_values('f','y',1,2);
-				break;
-			case 'R': //left rug
-				mv[i][j].set_values('r','y',5,3);
-				break;
-			case 'Y': //right rug
-				mv[i][j].set_values('y','y',5,4);
-				break;
-			case '1'://left of roof
-				mv[i][j].set_values('1','n',7,3);
-				break;
-			case '2'://roof center
-				mv[i][j].set_values('2','n',7,4);
-				break;
-			case '3'://small window leftside on roof
-				mv[i][j].set_values('3','n',7,5);
-				break;
-			case '4': //flowerpot window
-				mv[i][j].set_values('4','n',7,6);
-				break;
-			case '5': //small window rightside on roof
-				mv[i][j].set_values('5','n',7,7);
-				break;
-			case '6'://right of roof
-				mv[i][j].set_values('6','n',7,8);
-				break;
-			case '7': //left wall
-				mv[i][j].set_values('7','n',8,3);
-				break;
-			case '8': //wall
-				mv[i][j].set_values('8','n',8,4);
-				break;
-			case '9': //rake
-				mv[i][j].set_values('9','n',8,5);
-				break;
-			case '!': //door
-				mv[i][j].set_values('!','y',8,6);
-				break;
-			case '@': //broom
-				mv[i][j].set_values('@','n',8,7);
-				break;
-			case '#': //right wall
-				mv[i][j].set_values('#','n',8,8);
-				break;
-			case '$': //left of shingles
-				mv[i][j].set_values('$','n',6,3);
-				break;
-			case '%': //shingles
-				mv[i][j].set_values('%','n',6,4);
-				break;
-			case '^': //right of shingles
-				mv[i][j].set_values('^','n',6,5);
-				break;
-
-			}
-			counter++;
-		}
-	}
-	return mv;
-}
 
 int main(void)
 {
@@ -291,7 +196,6 @@ int main(void)
 
 		if(redraw && al_is_event_queue_empty(event_queue))
 		{
-			cout<<"frame";
 			redraw = false;
 
 			//DRAW MAP################################################################################################################
@@ -301,15 +205,20 @@ int main(void)
 				}
 			}	
 
+			//DRAW & ANIMATE HERO####################################################################################################
 			switch (hero.facing) {
 			case 'u':
 				if(hero.move_animation==true) {
-					if (hero.can_pass(hero.facing,mv,hero)) {
-						al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-hero.frame, 0);
-						if(hero.frame == 15) {
-							hero.move_animation = false;
-							hero.hloc-=1;
-						}
+					if (hero.frame<= 7) {
+						al_draw_bitmap_region(tileset, 1 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-hero.frame, 0);
+					}
+					else if (hero.frame < 15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-hero.frame, 0);
+					}
+					else if(hero.frame == 15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-hero.frame, 0);
+						hero.move_animation = false;
+						hero.hloc-=1;
 					}
 					hero.frame++;
 				}
@@ -319,12 +228,16 @@ int main(void)
 				break;
 			case 'd':
 				if(hero.move_animation==true) {
-					if(hero.can_pass(hero.facing,mv,hero)) {
-						al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+hero.frame, 0);
-						if(hero.frame==15) {
-							hero.move_animation = false;
-							hero.hloc+=1;
-						}
+					if(hero.frame <=7) {
+						al_draw_bitmap_region(tileset, 1 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+hero.frame, 0);
+					}
+					else if(hero.frame <= 14) {
+						al_draw_bitmap_region(tileset, 2 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+hero.frame, 0);
+					}
+					else if(hero.frame==15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+hero.frame, 0);
+						hero.move_animation = false;
+						hero.hloc+=1;
 					}
 					hero.frame++;
 				}
@@ -334,10 +247,14 @@ int main(void)
 				break;
 			case 'l':
 				if(hero.move_animation==true) {
-					if(hero.can_pass(hero.facing,mv,hero)) {
-						al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16-hero.frame, hero.hloc*16-4, 0);
+					if(hero.frame<=7) {
+						al_draw_bitmap_region(tileset, 1 * 16, 4 * 16, 16, 16, hero.wloc*16-hero.frame, hero.hloc*16-4, 0);
 					}
-					if(hero.frame==15) {
+					else if(hero.frame<=14) {
+						al_draw_bitmap_region(tileset, 2 * 16, 4 * 16, 16, 16, hero.wloc*16-hero.frame, hero.hloc*16-4, 0);
+					}
+					else if(hero.frame==15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 4 * 16, 16, 16, hero.wloc*16-hero.frame, hero.hloc*16-4, 0);
 						hero.move_animation = false;
 						hero.wloc-=1;
 					}
@@ -349,10 +266,14 @@ int main(void)
 				break;
 			case 'r':
 				if(hero.move_animation==true) {
-					if(hero.can_pass(hero.facing,mv,hero)) {
-						al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16+hero.frame, hero.hloc*16-4, 0);
+					if(hero.frame<=7) {
+						al_draw_bitmap_region(tileset, 1 * 16, 5 * 16, 16, 16, hero.wloc*16+hero.frame, hero.hloc*16-4, 0);
 					}
-					if(hero.frame==15) {
+					else if(hero.frame<=14) {
+						al_draw_bitmap_region(tileset, 2 * 16, 5 * 16, 16, 16, hero.wloc*16+hero.frame, hero.hloc*16-4, 0);
+					}
+					else if(hero.frame==15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 5 * 16, 16, 16, hero.wloc*16+hero.frame, hero.hloc*16-4, 0);
 						hero.move_animation = false;
 						hero.wloc+=1;
 					}
