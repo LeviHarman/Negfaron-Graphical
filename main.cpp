@@ -18,6 +18,7 @@ int main(void)
 	ALLEGRO_TIMER* timer=NULL;
 	ALLEGRO_BITMAP *tileset = NULL;
 	ALLEGRO_SAMPLE *sample;
+	ALLEGRO_FONT *font;
 
 	//primitive variables
 	bool done = false;
@@ -36,6 +37,7 @@ int main(void)
 	//Object variables
 	Entity hero;
 	hero.set_loc(12,15);
+	hero.frame = NULL;
 	hero.facing = 'd';
 	hero.move_animation = false;
 	
@@ -54,8 +56,11 @@ int main(void)
 	al_install_audio();
 	al_init_acodec_addon();
 	al_reserve_samples(1);
+	al_init_font_addon();
+	al_init_ttf_addon();
 
 	sample = al_load_sample("collision.ogg");
+	font = al_load_font("FROMAN.ttf",16,0);
 	timer=al_create_timer(1.0/FPS);
 	event_queue = al_create_event_queue();
 
@@ -86,15 +91,19 @@ int main(void)
 		{
 			switch(ev.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
+				write_dialogue = false;
 				keys[UP] = true;
 				break;
 			case ALLEGRO_KEY_DOWN:
+				write_dialogue = false;
 				keys[DOWN]=true;
 				break;
 			case ALLEGRO_KEY_RIGHT:
+				write_dialogue = false;
 				keys[RIGHT]=true;
 				break;
 			case ALLEGRO_KEY_LEFT:
+				write_dialogue = false;
 				keys[LEFT]=true;
 				break;
 			case ALLEGRO_KEY_Z:
@@ -216,7 +225,7 @@ int main(void)
 			//DRAW MAP###############################################################################################################
 			for(int col=0;col<height;col++) {
 				for(int row=0;row<width;row++) {
-					al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, (row*16 - hero.wloc*16)+15*16, (col*16 - hero.hloc*16)+15*16+hero.frame-16, 0);
+					al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, (row*16 - hero.wloc*16)+height/2*16, (col*16 - hero.hloc*16)+width/2*16+hero.frame-16, 0);
 				}
 			}	
 
@@ -225,9 +234,9 @@ int main(void)
 
 			//display message
 			if(write_dialogue ==true) {
-				entity_message(tileset);
+				entity_message(tileset,hero,font,mve,height,width);
 			}
-
+			
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
 		}
@@ -236,6 +245,9 @@ int main(void)
 	al_destroy_display(display);
 	al_destroy_bitmap(tileset);
 	al_destroy_sample(sample);
+	al_destroy_font(font);
+	al_destroy_event_queue(event_queue);
+	al_destroy_timer (timer);
 
 	return 0;
 }
