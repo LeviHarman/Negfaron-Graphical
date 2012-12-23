@@ -87,7 +87,9 @@ vector<vector<Tile>> make_map(int x, int y, string map) {
 			case '^': //right of shingles
 				mv[i][j].set_values('^','n',6,5);
 				break;
-
+			case 'P': //Turnip greens
+				mv[i][j].set_values('p','y',5,5);
+				break;
 			}
 			counter++;
 		}
