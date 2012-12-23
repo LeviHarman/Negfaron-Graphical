@@ -1,19 +1,92 @@
 Entity move_hero (Entity hero, ALLEGRO_BITMAP* tileset,vector<vector<Tile>> mv,int height,int width) {
 	if(hero.move_animation==false) {
 		if(hero.is_swing_hoe == true) {
-			if(hero.sta_frame<=7) {
-				al_draw_bitmap_region(tileset, 0 * 16, 13 * 16, 16, 16, 15 * 16, 14 * 16, 0);
-				al_draw_bitmap_region(tileset, 0 * 16, 14 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+			switch (hero.facing) {
+			case 'u':
+				if(hero.sta_frame<=9) {
+					al_draw_bitmap_region(tileset, 0 * 16, 17 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 0 * 16, 16 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+				}
+				else if(hero.sta_frame<=19) {
+					al_draw_bitmap_region(tileset, 1 * 16, 17 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 1 * 16, 16 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+				}
+				else if(hero.sta_frame<=29) {
+					al_draw_bitmap_region(tileset, 2 * 16, 17 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 16 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+				}
+				else if (hero.sta_frame <= 30) {
+					al_draw_bitmap_region(tileset, 2 * 16, 17 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 16 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					hero.is_swing_hoe = false;
+				}
+				break;
+			case 'd' :
+				if(hero.sta_frame<=9) {
+					al_draw_bitmap_region(tileset, 0 * 16, 13 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 0 * 16, 14 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+				}
+				else if(hero.sta_frame<=19) {
+					al_draw_bitmap_region(tileset, 1 * 16, 13 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 1 * 16, 14 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+				}
+				else if(hero.sta_frame<=29) {
+					al_draw_bitmap_region(tileset, 2 * 16, 13 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 14 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 15 * 16, 16, 16, 15 * 16, 16 * 16, 0);
+				}
+				else if (hero.sta_frame <= 30) {
+					al_draw_bitmap_region(tileset, 2 * 16, 13 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 14 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 15 * 16, 16, 16, 15 * 16, 16 * 16, 0);
+					hero.is_swing_hoe = false;
+				}
+				break;
+			case 'l':
+				if(hero.sta_frame<=9) {
+					al_draw_bitmap_region(tileset, 0 * 16, 18 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 0 * 16, 19 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+				}
+				else if(hero.sta_frame<=19) {
+					al_draw_bitmap_region(tileset, 1 * 16, 18 * 16, 16, 16, 14 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 1 * 16, 19 * 16, 16, 16, 14 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 18 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 19 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+				}
+				else if(hero.sta_frame<=29) {
+					al_draw_bitmap_region(tileset, 3 * 16, 19 * 16, 16, 16, 14 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 4 * 16, 19 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+				}
+				else if (hero.sta_frame <= 30) {
+					al_draw_bitmap_region(tileset, 3 * 16, 19 * 16, 16, 16, 14 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 4 * 16, 19 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					hero.is_swing_hoe = false;
+				}
+				break;
+			case 'r':
+				if(hero.sta_frame<=9) {
+					al_draw_bitmap_region(tileset, 0 * 16, 20 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 0 * 16, 21 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+				}
+				else if(hero.sta_frame<=19) {
+					al_draw_bitmap_region(tileset, 1 * 16, 20 * 16, 16, 16, 15 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 1 * 16, 21 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 20 * 16, 16, 16, 16 * 16, 14 * 16, 0);
+					al_draw_bitmap_region(tileset, 2 * 16, 21 * 16, 16, 16, 16 * 16, 15 * 16, 0);
+				}
+				else if(hero.sta_frame<=29) {
+					al_draw_bitmap_region(tileset, 3 * 16, 21 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 4 * 16, 21 * 16, 16, 16, 16 * 16, 15 * 16, 0);
+				}
+				else if (hero.sta_frame <= 30) {
+					al_draw_bitmap_region(tileset, 3 * 16, 21 * 16, 16, 16, 15 * 16, 15 * 16, 0);
+					al_draw_bitmap_region(tileset, 4 * 16, 21 * 16, 16, 16, 16 * 16, 15 * 16, 0);
+					hero.is_swing_hoe = false;
+				}
+				break;
+				break;
 			}
-			else if(hero.sta_frame<=14) {
-				al_draw_bitmap_region(tileset, 1 * 16, 13 * 16, 16, 16, 15 * 16, 14 * 16, 0);
-				al_draw_bitmap_region(tileset, 1 * 16, 14 * 16, 16, 16, 15 * 16, 15 * 16, 0);
-			}
-			else if(hero.sta_frame==15) {
-				al_draw_bitmap_region(tileset, 2 * 16, 13 * 16, 16, 16, 15 * 16, 14 * 16, 0);
-				al_draw_bitmap_region(tileset, 2 * 16, 14 * 16, 16, 16, 15 * 16, 15 * 16, 0);
-				hero.is_swing_hoe = false;
-			}
+
 			hero.sta_frame++;
 		}
 	}
