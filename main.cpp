@@ -1,12 +1,7 @@
-//Programmed by Levi Harman
-//Date: Started Dec. 2012
-
 #include "main.h"
 #include "maps.h"
 #include "map_entity.h"
 #include "make_map.h"
-#include "move_hero.h"
-#include "entity_message.h"
 
 enum KEYS{UP,DOWN,LEFT,RIGHT};
 
@@ -22,8 +17,7 @@ int main(void)
 	//primitive variables
 	bool done = false;
 	bool keys[4] = {false,false,false,false};
-	bool redraw = true;
-	bool write_dialogue = false;
+	bool redraw = false;
 
 	//integer variables
 	int width = 30;  //row x
@@ -72,7 +66,6 @@ int main(void)
 	tileset = al_load_bitmap("tileset.png");
 	al_convert_mask_to_alpha(tileset, al_map_rgb(0,255,255));
 
-
 	//game loop
 	while(!done)
 	{
@@ -98,34 +91,28 @@ int main(void)
 				keys[LEFT]=true;
 				break;
 			case ALLEGRO_KEY_Z:
-				if(write_dialogue == true) {
-					write_dialogue = false;
-				}
-				else {
-					switch(hero.facing) {
-					case 'u':
-						if(mve[hero.hloc-1][hero.wloc].interact == 'y') {
-							write_dialogue = true;
-						}
-						break;
-					case 'd':
-						if(mve[hero.hloc+1][hero.wloc].interact == 'y') {
-							write_dialogue = true;
-						}
-						break;
-					case 'l':
-						if(mve[hero.hloc][hero.wloc-1].interact == 'y') {
-							write_dialogue = true;
-						}
-						break;
-					case 'r':
-						if(mve[hero.hloc][hero.wloc+1].interact == 'y') {
-							write_dialogue = true;
-						}
-
-						break;
-					break;
+				switch(hero.facing) {
+				case 'u':
+					if(mve[hero.hloc-1][hero.wloc].interact == 'y') {
+						cout<<mve[hero.hloc-1][hero.wloc].dialogue;
 					}
+					break;
+				case 'd':
+					if(mve[hero.hloc+1][hero.wloc].interact == 'y') {
+						cout<<mve[hero.hloc+1][hero.wloc].dialogue;
+					}
+					break;
+				case 'l':
+					if(mve[hero.hloc][hero.wloc-1].interact == 'y') {
+						cout<<mve[hero.hloc][hero.wloc-1].dialogue;
+					}
+					break;
+				case 'r':
+					if(mve[hero.hloc][hero.wloc+1].interact == 'y') {
+						cout<<mve[hero.hloc][hero.wloc+1].dialogue;
+					}
+					break;
+				break;
 				}
 			}
 		}
@@ -140,7 +127,6 @@ int main(void)
 			switch(ev.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
 				keys[UP] = false;
-				//al_resize_display(display,(hero.hloc/16)+16,hero.wloc/.16);
 				break;
 			case ALLEGRO_KEY_DOWN:
 				keys[DOWN]=false;
@@ -190,7 +176,7 @@ int main(void)
 			}
 		}
 
-		//CHECK FOR ON STEP EVENT###################################################################################################
+		//CHECK FOR ON STEP EVENT################################################################################################
 		if(mve[hero.hloc][hero.wloc].step_on == 'y') {
 			if (mve[hero.hloc][hero.wloc].map_warp == "house") {
 				hero.set_loc(mve[hero.hloc][hero.wloc].warp_col,mve[hero.hloc][hero.wloc].warp_row);
@@ -208,25 +194,96 @@ int main(void)
 			}
 		}
 
-		//This block runs 60 times per second########################################################################################
 		if(redraw && al_is_event_queue_empty(event_queue))
 		{
 			redraw = false;
 
-			//DRAW MAP###############################################################################################################
+			//DRAW MAP################################################################################################################
 			for(int col=0;col<height;col++) {
 				for(int row=0;row<width;row++) {
-					al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, (row*16 - hero.wloc*16)+15*16, (col*16 - hero.hloc*16)+15*16+hero.frame-16, 0);
+					al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, row*16, col*16, 0);
 				}
 			}	
 
 			//DRAW & ANIMATE HERO####################################################################################################
-			hero = move_hero(hero,tileset,mv,height,width);
-
-			//display message
-			if(write_dialogue ==true) {
-				entity_message(tileset);
-			}
+			switch (hero.facing) {
+			case 'u':
+				if(hero.move_animation==true) {
+					if (hero.frame<= 7) {
+						al_draw_bitmap_region(tileset, 1 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-hero.frame, 0);
+					}
+					else if (hero.frame < 15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-hero.frame, 0);
+					}
+					else if(hero.frame == 15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 3 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)-hero.frame, 0);
+						hero.move_animation = false;
+						hero.hloc-=1;
+					}
+					hero.frame++;
+				}
+				else {
+					al_draw_bitmap_region(tileset, 0 * 16, 3 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+				}
+				break;
+			case 'd':
+				if(hero.move_animation==true) {
+					if(hero.frame <=7) {
+						al_draw_bitmap_region(tileset, 1 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+hero.frame, 0);
+					}
+					else if(hero.frame <= 14) {
+						al_draw_bitmap_region(tileset, 2 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+hero.frame, 0);
+					}
+					else if(hero.frame==15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 2 * 16, 16, 16, hero.wloc*16, (hero.hloc*16-4)+hero.frame, 0);
+						hero.move_animation = false;
+						hero.hloc+=1;
+					}
+					hero.frame++;
+				}
+				else {
+					al_draw_bitmap_region(tileset, 0 * 16, 2 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+				}
+				break;
+			case 'l':
+				if(hero.move_animation==true) {
+					if(hero.frame<=7) {
+						al_draw_bitmap_region(tileset, 1 * 16, 4 * 16, 16, 16, hero.wloc*16-hero.frame, hero.hloc*16-4, 0);
+					}
+					else if(hero.frame<=14) {
+						al_draw_bitmap_region(tileset, 2 * 16, 4 * 16, 16, 16, hero.wloc*16-hero.frame, hero.hloc*16-4, 0);
+					}
+					else if(hero.frame==15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 4 * 16, 16, 16, hero.wloc*16-hero.frame, hero.hloc*16-4, 0);
+						hero.move_animation = false;
+						hero.wloc-=1;
+					}
+					hero.frame++;
+				}
+				else {
+					al_draw_bitmap_region(tileset, 0 * 16, 4 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+				}
+				break;
+			case 'r':
+				if(hero.move_animation==true) {
+					if(hero.frame<=7) {
+						al_draw_bitmap_region(tileset, 1 * 16, 5 * 16, 16, 16, hero.wloc*16+hero.frame, hero.hloc*16-4, 0);
+					}
+					else if(hero.frame<=14) {
+						al_draw_bitmap_region(tileset, 2 * 16, 5 * 16, 16, 16, hero.wloc*16+hero.frame, hero.hloc*16-4, 0);
+					}
+					else if(hero.frame==15) {
+						al_draw_bitmap_region(tileset, 2 * 16, 5 * 16, 16, 16, hero.wloc*16+hero.frame, hero.hloc*16-4, 0);
+						hero.move_animation = false;
+						hero.wloc+=1;
+					}
+					hero.frame++;
+				}
+				else {
+					al_draw_bitmap_region(tileset, 0 * 16, 5 * 16, 16, 16, hero.wloc*16, hero.hloc*16-4, 0);
+				}
+				break;
+			}	
 
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0,0,0));
