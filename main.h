@@ -27,11 +27,11 @@ void Tile::set_values(char cid1,char pass1,int sy1,int sx1) {
 
 class Entity {
 public:
-	int wloc, hloc, frame;
+	int wloc, hloc, frame,sta_frame;
 	int warp_row, warp_col;
 	char interact,step_on,facing;
 	string dialogue,map_warp;
-	bool move_animation;
+	bool move_animation, is_swing_hoe;
 	void set_loc(int,int);
 	void entity_event(string);
 	void set_warp(string);
@@ -45,12 +45,14 @@ void Entity::cleanup() {
 	wloc = NULL;
 	hloc = NULL;
 	frame = NULL;
+	sta_frame = NULL;
 	warp_row=NULL;
 	warp_col=NULL;
 	interact = NULL;
 	step_on=NULL;
 	facing = NULL;
 	move_animation = NULL;
+	is_swing_hoe = NULL;
 }
 
 bool Entity::can_pass(char dir, vector<vector<Tile>> mv,Entity hero) {
