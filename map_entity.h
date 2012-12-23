@@ -12,7 +12,7 @@ vector<vector<Entity>> init_map_house_entity(vector<vector<Entity>> &mve) {
 //HOME - entities for home.
 vector<vector<Entity>> init_map_home_entity(vector<vector<Entity>> &mve) {
  	Entity sign;
-	sign.entity_event("Hello, entity event is working.");
+	sign.entity_event("Levis House.");
 	mve[22][5] = sign;
 		
 	Entity door;
