@@ -39,6 +39,7 @@ int main(void)
 	hero.set_loc(12,15);
 	hero.frame = NULL;
 	hero.facing = 'd';
+	hero.is_swing_hoe = false;
 	hero.move_animation = false;
 	
 	if(!al_init())
@@ -106,6 +107,12 @@ int main(void)
 				write_dialogue = false;
 				keys[LEFT]=true;
 				break;
+			case ALLEGRO_KEY_RCTRL:
+				if (hero.move_animation == false && hero.is_swing_hoe == false) {
+					hero.sta_frame = 1;
+					hero.is_swing_hoe = true;
+				}
+				break;
 			case ALLEGRO_KEY_Z:
 				if(write_dialogue == true) {
 					write_dialogue = false;
@@ -171,28 +178,28 @@ int main(void)
 		if (hero.move_animation == false) {
 			if (keys[UP]==true) {
 				hero.facing = 'u';
-				if (hero.can_pass(hero.facing,mv,hero)) {
+				if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
 					hero.frame = 1;
 					hero.move_animation = true;
 				}
 			}	
 			else if (keys[DOWN]==true) {
 				hero.facing = 'd';
-				if (hero.can_pass(hero.facing,mv,hero)) {
+				if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
 					hero.frame = 1;
 					hero.move_animation = true;
 				}
 			}
 			else if (keys[LEFT] == true) {
 				hero.facing = 'l';
-				if (hero.can_pass(hero.facing,mv,hero)) {
+				if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
 					hero.frame = 1;
 					hero.move_animation = true;
 				}		
 			}
 			else if (keys[RIGHT] == true) {
 				hero.facing = 'r';
-				if (hero.can_pass(hero.facing,mv,hero)) {
+				if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
 					hero.frame = 1;
 					hero.move_animation = true;
 				}
