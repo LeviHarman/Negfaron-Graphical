@@ -25,6 +25,7 @@ int main(void)
 	bool keys[4] = {false,false,false,false};
 	bool redraw = true;
 	bool write_dialogue = false;
+	bool game_start = false;
 
 	//integer variables
 	int width = 30;  //row x
@@ -45,7 +46,7 @@ int main(void)
 	if(!al_init())
 		return -1;
 
-	display = al_create_display((width*16)-1,(height*16)-1);
+	display = al_create_display((30*16)-1,(30*16)-1);
 
 	if(!display)
 		return -1;
@@ -114,6 +115,7 @@ int main(void)
 				}
 				break;
 			case ALLEGRO_KEY_Z:
+				game_start = true;
 				if(write_dialogue == true) {
 					write_dialogue = false;
 				}
@@ -177,31 +179,39 @@ int main(void)
 		//WAIT UNTIL ANIMATION IS OVER - If key is still pressed animate again. (Pokemon esque)
 		if (hero.move_animation == false) {
 			if (keys[UP]==true) {
-				hero.facing = 'u';
-				if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
-					hero.frame = 1;
-					hero.move_animation = true;
+				if (hero.is_swing_hoe == false) {
+					hero.facing = 'u';
+					if (hero.can_pass(hero.facing,mv,hero)) {
+						hero.frame = 1;
+						hero.move_animation = true;
+					}
 				}
 			}	
 			else if (keys[DOWN]==true) {
-				hero.facing = 'd';
-				if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
-					hero.frame = 1;
-					hero.move_animation = true;
+				if (hero.is_swing_hoe == false) {
+					hero.facing = 'd';
+					if (hero.can_pass(hero.facing,mv,hero)) {
+						hero.frame = 1;
+						hero.move_animation = true;
+					}
 				}
 			}
 			else if (keys[LEFT] == true) {
-				hero.facing = 'l';
-				if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
-					hero.frame = 1;
-					hero.move_animation = true;
-				}		
+				if (hero.is_swing_hoe == false) {
+					hero.facing = 'l';
+					if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
+						hero.frame = 1;
+						hero.move_animation = true;
+					}	
+				}
 			}
 			else if (keys[RIGHT] == true) {
-				hero.facing = 'r';
-				if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
-					hero.frame = 1;
-					hero.move_animation = true;
+				if(hero.is_swing_hoe == false) {
+					hero.facing = 'r';
+					if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
+						hero.frame = 1;
+						hero.move_animation = true;
+					}
 				}
 			}
 		}
@@ -228,24 +238,25 @@ int main(void)
 		if(redraw && al_is_event_queue_empty(event_queue))
 		{
 			redraw = false;
+			if(game_start == true) {
+				//DRAW MAP###############################################################################################################
+				for(int col=0;col<height;col++) {
+					for(int row=0;row<width;row++) {
+						al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, (row*16 - hero.wloc*16)+height/2*16, (col*16 - hero.hloc*16)+width/2*16+hero.frame-16, 0);
+					}
+				}	
 
-			//DRAW MAP###############################################################################################################
-			for(int col=0;col<height;col++) {
-				for(int row=0;row<width;row++) {
-					al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, (row*16 - hero.wloc*16)+height/2*16, (col*16 - hero.hloc*16)+width/2*16+hero.frame-16, 0);
+				//DRAW & ANIMATE HERO####################################################################################################
+				hero = move_hero(hero,tileset,mv,height,width);
+
+				//display message
+				if(write_dialogue ==true) {
+					entity_message(tileset,hero,font,mve,height,width);
 				}
-			}	
-
-			//DRAW & ANIMATE HERO####################################################################################################
-			hero = move_hero(hero,tileset,mv,height,width);
-
-			//display message
-			if(write_dialogue ==true) {
-				entity_message(tileset,hero,font,mve,height,width);
-			}
 			
-			al_flip_display();
-			al_clear_to_color(al_map_rgb(0,0,0));
+				al_flip_display();
+				al_clear_to_color(al_map_rgb(0,0,0));
+			}
 		}
 	}
 
