@@ -6,6 +6,10 @@ vector<vector<Entity>> init_map_house_entity(vector<vector<Entity>> &mve) {
 	mve[17][15] = rug;
 	mve[17][16] = rug;
 
+	Entity spider;
+	spider.entity_event("Levis House.");
+	mve[15][13] = spider;
+
 	return mve;
 }
 
