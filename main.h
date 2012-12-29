@@ -29,6 +29,7 @@ class Entity {
 public:
 	int wloc, hloc, frame,sta_frame;
 	int warp_row, warp_col;
+	int wait_time;
 	char interact,step_on,facing;
 	string dialogue,map_warp;
 	bool move_animation, is_swing_hoe;
@@ -39,6 +40,7 @@ public:
 	void cleanup ();
 	bool can_pass(char,vector<vector<Tile>>,Entity);
 	bool action_button; 
+	Entity hero_turning(Entity,char,vector<vector<Tile>>);
 };
 
 void Entity::cleanup() {
@@ -48,11 +50,28 @@ void Entity::cleanup() {
 	sta_frame = NULL;
 	warp_row=NULL;
 	warp_col=NULL;
+	wait_time = NULL;
 	interact = NULL;
 	step_on=NULL;
 	facing = NULL;
 	move_animation = NULL;
 	is_swing_hoe = NULL;
+}
+
+Entity Entity::hero_turning(Entity hero, char facing1, vector<vector<Tile>> mv) {
+	if (hero.is_swing_hoe == false) {
+					
+		if(hero.facing != facing1) {
+			hero.facing = facing1;
+			hero.wait_time = 0;
+		}
+
+		else if (hero.can_pass(hero.facing,mv,hero)&& hero.wait_time > 5) {
+			hero.frame = 1;
+			hero.move_animation = true;
+		}
+	}
+	return hero;
 }
 
 bool Entity::can_pass(char dir, vector<vector<Tile>> mv,Entity hero) {
