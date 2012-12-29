@@ -1,5 +1,7 @@
 /*draws 3 frame animations.
-variables
+
+variables description
+##############################
 tileset, tile width, Entity being animated,  1-3
 column for first, second, and third frames. 4-6
 row for first,second, and third frames. 7-9
@@ -8,16 +10,16 @@ radj, and cadj are for adjusting the center of animation. makes function tweakab
 */
 
 Entity three_frame_animation(ALLEGRO_BITMAP* tileset, int tw, Entity hero,int ci1,int ci2, int ci3, int ri1, int ri2, int ri3,int aheight,int awidth,int radj, int cadj) {
-	if(hero.sta_frame<=9) {
+	if(hero.sta_frame<=2) {
 		al_draw_bitmap_region(tileset, (ri1)*tw, (ci1)*tw, tw*awidth, tw*aheight, (16+radj)*tw, (16+cadj)*tw, 0);
 	}
-	else if(hero.sta_frame<=19) {
+	else if(hero.sta_frame<=4) {
 		al_draw_bitmap_region(tileset, (ri2)*tw, (ci2)*tw, tw*awidth, tw*aheight, (16+radj)*tw, (16+cadj)*tw, 0);
 	}
-	else if(hero.sta_frame<=29) {
+	else if(hero.sta_frame<=5) {
 		al_draw_bitmap_region(tileset, (ri3)*tw, (ci3)*tw, tw*awidth, tw*aheight, (16+radj)*tw, (16+cadj)*tw, 0);
 	}
-	else if (hero.sta_frame <= 30) {
+	else if (hero.sta_frame <= 6) {
 		al_draw_bitmap_region(tileset, (ri3)*tw, (ci3)*tw, tw*awidth, tw*aheight, (16+radj)*tw, (16+cadj)*tw, 0);
 		hero.is_swing_hoe = false;
 	}
@@ -28,7 +30,7 @@ Entity three_frame_animation(ALLEGRO_BITMAP* tileset, int tw, Entity hero,int ci
 Draws the walking animation
 
 Variable description
-
+#######################
 Entity being animated, tileset,map vector 1-3
 tile width, animation height in tiles, and animation width in tiles
 height, and width of map in tiles.
@@ -43,22 +45,23 @@ Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>
 		int frameinth=0;
 		int hl=0;
 		int vl=0;
+
 		switch (hero.facing) {
 		case 'u':
 			vl = -1;
-			frameintv = hero.frame;
+			frameintv = hero.frame * 3;
 			break;
 		case 'd' :
 			vl=1;
-			frameintv = hero.frame *-1;
+			frameintv = (hero.frame * 3) *-1;
 			break;
 		case 'l' :
 			hl=-1;
-			frameinth = hero.frame;
+			frameinth = hero.frame * 3;
 			break;
 		case 'r':
 			hl=1;
-			frameinth = hero.frame *-1;
+			frameinth = (hero.frame * 3) *-1;
 			break;
 		}
 
@@ -68,13 +71,13 @@ Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>
 			}
 		}	
 
-		if (hero.frame<= 7) {
+		if (hero.frame<= 2) {
 			al_draw_bitmap_region(tileset, ri2*tw, ci2*tw, tw, tw, 15*tw, 15*tw, 0);
 		}
-		else if (hero.frame < 15) {
+		else if (hero.frame < 5) {
 			al_draw_bitmap_region(tileset, ri3*tw, ci3*tw, tw, tw, 15*tw, 15*tw, 0);
 		}
-		else if(hero.frame == 15) {
+		else if(hero.frame == 5) {
 			al_draw_bitmap_region(tileset, ri3*tw, ci3*tw, tw, tw, 15*tw, 15*tw, 0);
 			hero.move_animation = false;
 			hero.hloc+=vl;
