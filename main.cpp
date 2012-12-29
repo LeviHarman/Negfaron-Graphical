@@ -7,41 +7,86 @@
 #include "make_map.h"
 #include "move_hero.h"
 #include "entity_message.h"
+#include <time.h>;
 
 enum KEYS{UP,DOWN,LEFT,RIGHT};
 
+
+/*
+   can_interact: hvar and wvar are used to convert char facing into
+   a + or - value used to call the .interact function of Hero class
+*/
+bool can_interact (Entity * hero, bool write_dialogue, vector<vector<Entity>> mve){
+	int hvar = 0;
+	int wvar = 0;
+
+	switch(hero->facing) {
+	case 'u':
+		hvar = -1;
+		break;
+	case 'd':
+		hvar = 1;
+		break;
+	case 'l':
+		wvar = -1;
+		break;
+	case 'r':
+		wvar = 1;
+		break;
+	}
+
+	if(mve[hero->hloc+hvar][hero->wloc+wvar].interact == 'y') {
+		write_dialogue = true;
+	}
+
+	return can_interact;
+}
+
 int main(void)
 {
-	//Allegro variables
-	ALLEGRO_DISPLAY* display = NULL;
-	ALLEGRO_EVENT_QUEUE* event_queue=NULL;
-	ALLEGRO_TIMER* timer=NULL;
-	ALLEGRO_BITMAP *tileset = NULL;
-	ALLEGRO_SAMPLE *sample;
-	ALLEGRO_FONT *font;
+	/*
+	Allegro variables
+	*/
+	ALLEGRO_DISPLAY * display = NULL;
+	ALLEGRO_EVENT_QUEUE * event_queue=NULL;
+	ALLEGRO_TIMER * timer=NULL;
+	ALLEGRO_BITMAP * tileset = NULL;
+	ALLEGRO_SAMPLE * sample;
+	ALLEGRO_FONT * font;
 
-	//primitive variables
+	/*
+	Primitive variables
+	*/
 	bool done = false;
 	bool keys[4] = {false,false,false,false};
 	bool redraw = true;
 	bool write_dialogue = false;
 	bool game_start = false;
-
-	//integer variables
+	
+	/*
+	Integer variables
+	*/
 	int width = 30;  //row x
 	int height = 30; //col y
-	int FPS = 60;
+	int FPS = 30;
+	int time1;
+	int time2;
 
-	//string variables
+	/*
+	String variables
+	*/
 	string cur_map;
 	
-	//Object variables
-	Entity hero;
-	hero.set_loc(12,15);
-	hero.frame = NULL;
-	hero.facing = 'd';
-	hero.is_swing_hoe = false;
-	hero.move_animation = false;
+	/*
+	Object variables
+	*/
+	Entity * hero = new Entity;
+	hero->set_loc(12,15);
+	hero->frame = 6;
+	hero->facing = 'd';
+	hero->is_swing_hoe = false;
+	hero->move_animation = false;
+	hero->wait_time=1;
 	
 	if(!al_init())
 		return -1;
@@ -51,7 +96,9 @@ int main(void)
 	if(!display)
 		return -1;
 
-	//Allegro module init
+	/*
+	Initialize allegro modules.
+	*/
 	al_install_keyboard();
 	al_init_primitives_addon();
 	al_init_image_addon();
@@ -61,9 +108,12 @@ int main(void)
 	al_init_font_addon();
 	al_init_ttf_addon();
 
+	/*
+	Initialize allegro variables.
+	*/
 	sample = al_load_sample("collision.ogg");
-	font = al_load_font("FROMAN.ttf",16,0);
-	timer=al_create_timer(1.0/FPS);
+	font = al_load_font("arial.ttf",16,0);
+	timer = al_create_timer(1.0/FPS);
 	event_queue = al_create_event_queue();
 
 	//game init
@@ -109,9 +159,9 @@ int main(void)
 				keys[LEFT]=true;
 				break;
 			case ALLEGRO_KEY_RCTRL:
-				if (hero.move_animation == false && hero.is_swing_hoe == false) {
-					hero.sta_frame = 1;
-					hero.is_swing_hoe = true;
+				if (hero->move_animation == false && hero->is_swing_hoe == false) {
+					hero->sta_frame = 1;
+					hero->is_swing_hoe = true;
 				}
 				break;
 			case ALLEGRO_KEY_Z:
@@ -120,36 +170,12 @@ int main(void)
 					write_dialogue = false;
 				}
 				else {
-					switch(hero.facing) {
-					case 'u':
-						if(mve[hero.hloc-1][hero.wloc].interact == 'y') {
-							write_dialogue = true;
-						}
-						break;
-					case 'd':
-						if(mve[hero.hloc+1][hero.wloc].interact == 'y') {
-							write_dialogue = true;
-						}
-						break;
-					case 'l':
-						if(mve[hero.hloc][hero.wloc-1].interact == 'y') {
-							write_dialogue = true;
-						}
-						break;
-					case 'r':
-						if(mve[hero.hloc][hero.wloc+1].interact == 'y') {
-							write_dialogue = true;
-						}
-
-						break;
-					break;
-					}
+					write_dialogue = can_interact(hero,write_dialogue,mve);
 				}
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
 
-			//end game
 			if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
 				done = true;
 			}
@@ -158,7 +184,6 @@ int main(void)
 			switch(ev.keyboard.keycode) {
 			case ALLEGRO_KEY_UP:
 				keys[UP] = false;
-				//al_resize_display(display,(hero.hloc/16)+16,hero.wloc/.16);
 				break;
 			case ALLEGRO_KEY_DOWN:
 				keys[DOWN]=false;
@@ -177,56 +202,32 @@ int main(void)
 		}
 
 		//WAIT UNTIL ANIMATION IS OVER - If key is still pressed animate again. (Pokemon esque)
-		if (hero.move_animation == false) {
+		if (hero->move_animation == false) {
 			if (keys[UP]==true) {
-				if (hero.is_swing_hoe == false) {
-					hero.facing = 'u';
-					if (hero.can_pass(hero.facing,mv,hero)) {
-						hero.frame = 1;
-						hero.move_animation = true;
-					}
-				}
+				*hero = hero->hero_turning(*hero,'u',mv);
 			}	
 			else if (keys[DOWN]==true) {
-				if (hero.is_swing_hoe == false) {
-					hero.facing = 'd';
-					if (hero.can_pass(hero.facing,mv,hero)) {
-						hero.frame = 1;
-						hero.move_animation = true;
-					}
-				}
+				*hero = hero->hero_turning(*hero,'d',mv);
 			}
 			else if (keys[LEFT] == true) {
-				if (hero.is_swing_hoe == false) {
-					hero.facing = 'l';
-					if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
-						hero.frame = 1;
-						hero.move_animation = true;
-					}	
-				}
+				*hero = hero->hero_turning(*hero,'l',mv);
 			}
 			else if (keys[RIGHT] == true) {
-				if(hero.is_swing_hoe == false) {
-					hero.facing = 'r';
-					if (hero.can_pass(hero.facing,mv,hero) && hero.is_swing_hoe == false) {
-						hero.frame = 1;
-						hero.move_animation = true;
-					}
-				}
+				*hero = hero->hero_turning(*hero,'r',mv);
 			}
 		}
 
 		//CHECK FOR ON STEP EVENT###################################################################################################
-		if(mve[hero.hloc][hero.wloc].step_on == 'y') {
-			if (mve[hero.hloc][hero.wloc].map_warp == "house") {
-				hero.set_loc(mve[hero.hloc][hero.wloc].warp_col,mve[hero.hloc][hero.wloc].warp_row);
+		if(mve[hero->hloc][hero->wloc].step_on == 'y') {
+			if (mve[hero->hloc][hero->wloc].map_warp == "house") {
+				hero->set_loc(mve[hero->hloc][hero->wloc].warp_col,mve[hero->hloc][hero->wloc].warp_row);
 				init_map_entity_cleanup(mve);
 				init_map_house_entity(mve);
 				init_map_house(cur_map,mve);
 				mv = make_map(height,width,cur_map);
 			}
-			else if (mve[hero.hloc][hero.wloc].map_warp == "home") {
-				hero.set_loc(mve[hero.hloc][hero.wloc].warp_col,mve[hero.hloc][hero.wloc].warp_row);
+			else if (mve[hero->hloc][hero->wloc].map_warp == "home") {
+				hero->set_loc(mve[hero->hloc][hero->wloc].warp_col,mve[hero->hloc][hero->wloc].warp_row);
 				init_map_entity_cleanup(mve);
 				init_map_home_entity(mve);
 				init_map_home(cur_map,mve);
@@ -234,24 +235,25 @@ int main(void)
 			}
 		}
 
-		//This block runs 60 times per second########################################################################################
+		hero->wait_time++;
+		//This block runs 60 times per second
 		if(redraw && al_is_event_queue_empty(event_queue))
 		{
 			redraw = false;
 			if(game_start == true) {
-				//DRAW MAP###############################################################################################################
+				//DRAW MAP
 				for(int col=0;col<height;col++) {
 					for(int row=0;row<width;row++) {
-						al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, (row*16 - hero.wloc*16)+height/2*16, (col*16 - hero.hloc*16)+width/2*16+hero.frame-16, 0);
+						al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, (row*16 - hero->wloc*16)+height/2*16, (col*16 - hero->hloc*16)+width/2*16+hero->frame-4, 0);
 					}
 				}	
 
-				//DRAW & ANIMATE HERO####################################################################################################
-				hero = move_hero(hero,tileset,mv,height,width);
+				//DRAW & ANIMATE HERO
+				*hero = move_hero(*hero,tileset,mv,height,width);
 
 				//display message
-				if(write_dialogue ==true) {
-					entity_message(tileset,hero,font,mve,height,width);
+				if(write_dialogue == true) {
+					entity_message(tileset,*hero,font,mve,height,width);
 				}
 			
 				al_flip_display();
@@ -260,12 +262,17 @@ int main(void)
 		}
 	}
 
+
+	/*
+	Cleanup
+	*/
 	al_destroy_display(display);
 	al_destroy_bitmap(tileset);
 	al_destroy_sample(sample);
 	al_destroy_font(font);
 	al_destroy_event_queue(event_queue);
 	al_destroy_timer (timer);
+	delete hero;
 
 	return 0;
 }
