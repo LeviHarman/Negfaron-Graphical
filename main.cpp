@@ -5,18 +5,18 @@
 #include "maps.h"
 #include "map_entity.h"
 #include "make_map.h"
+#include "draw_map.h"
 #include "move_hero.h"
 #include "entity_message.h"
-#include <time.h>;
 
 enum KEYS{UP,DOWN,LEFT,RIGHT};
-
 
 /*
    can_interact: hvar and wvar are used to convert char facing into
    a + or - value used to call the .interact function of Hero class
 */
 bool can_interact (Entity * hero, bool write_dialogue, vector<vector<Entity>> mve){
+	bool can_interact = false;
 	int hvar = 0;
 	int wvar = 0;
 
@@ -36,6 +36,7 @@ bool can_interact (Entity * hero, bool write_dialogue, vector<vector<Entity>> mv
 	}
 
 	if(mve[hero->hloc+hvar][hero->wloc+wvar].interact == 'y') {
+		can_interact = true;
 		write_dialogue = true;
 	}
 
@@ -61,16 +62,20 @@ int main(void)
 	bool keys[4] = {false,false,false,false};
 	bool redraw = true;
 	bool write_dialogue = false;
-	bool game_start = false;
 	
+	/*
+	wid_height initialization
+	*/
+	vector<int> wid_height;
+	wid_height.push_back(1);
+	wid_height.push_back(1);
+	wid_height[0] = 30; //col x
+	wid_height[1] = 30; //col y
+
 	/*
 	Integer variables
 	*/
-	int width = 30;  //row x
-	int height = 30; //col y
 	int FPS = 30;
-	int time1;
-	int time2;
 
 	/*
 	String variables
@@ -82,7 +87,6 @@ int main(void)
 	*/
 	Entity * hero = new Entity;
 	hero->set_loc(12,15);
-	hero->frame = 6;
 	hero->facing = 'd';
 	hero->is_swing_hoe = false;
 	hero->move_animation = false;
@@ -122,10 +126,12 @@ int main(void)
 	al_register_event_source(event_queue, al_get_display_event_source(display));
 
 	al_start_timer(timer);
-	vector<vector<Entity>> mve(width, vector<Entity>(height));
+
+	vector<vector<Entity>> mve(wid_height[0], vector<Entity>(wid_height[1]));
 	init_map_house(cur_map, mve);
-	vector<vector<Tile>> mv = make_map(height,width,cur_map);
+	vector<vector<Tile>> mv = make_map(wid_height,cur_map);
 	init_map_house_entity(mve);
+
 	tileset = al_load_bitmap("tileset.png");
 	al_convert_mask_to_alpha(tileset, al_map_rgb(0,255,255));
 
@@ -165,12 +171,11 @@ int main(void)
 				}
 				break;
 			case ALLEGRO_KEY_Z:
-				game_start = true;
 				if(write_dialogue == true) {
 					write_dialogue = false;
 				}
-				else {
-					write_dialogue = can_interact(hero,write_dialogue,mve);
+				else if (can_interact(hero,write_dialogue,mve) == true){ //neeeds if statement.
+					write_dialogue = true;
 				}
 			}
 		}
@@ -224,14 +229,14 @@ int main(void)
 				init_map_entity_cleanup(mve);
 				init_map_house_entity(mve);
 				init_map_house(cur_map,mve);
-				mv = make_map(height,width,cur_map);
+				mv = make_map(wid_height,cur_map);
 			}
 			else if (mve[hero->hloc][hero->wloc].map_warp == "home") {
 				hero->set_loc(mve[hero->hloc][hero->wloc].warp_col,mve[hero->hloc][hero->wloc].warp_row);
 				init_map_entity_cleanup(mve);
 				init_map_home_entity(mve);
 				init_map_home(cur_map,mve);
-				mv = make_map(height,width,cur_map);
+				mv = make_map(wid_height,cur_map);
 			}
 		}
 
@@ -240,25 +245,20 @@ int main(void)
 		if(redraw && al_is_event_queue_empty(event_queue))
 		{
 			redraw = false;
-			if(game_start == true) {
-				//DRAW MAP
-				for(int col=0;col<height;col++) {
-					for(int row=0;row<width;row++) {
-						al_draw_bitmap_region(tileset, mv[col][row].sx * 16, mv[col][row].sy * 16, 16, 16, (row*16 - hero->wloc*16)+height/2*16, (col*16 - hero->hloc*16)+width/2*16+hero->frame-4, 0);
-					}
-				}	
 
-				//DRAW & ANIMATE HERO
-				*hero = move_hero(*hero,tileset,mv,height,width);
+			//DRAW MAP
+			draw_map(tileset,wid_height,mv,hero,0,0);
 
-				//display message
-				if(write_dialogue == true) {
-					entity_message(tileset,*hero,font,mve,height,width);
-				}
-			
-				al_flip_display();
-				al_clear_to_color(al_map_rgb(0,0,0));
+			//DRAW & ANIMATE HERO
+			*hero = move_hero(*hero,tileset,mv,wid_height);
+
+			//display message
+			if(write_dialogue == true) {
+				entity_message(tileset,*hero,font,mve,wid_height);
 			}
+			
+			al_flip_display();
+			al_clear_to_color(al_map_rgb(0,0,0));
 		}
 	}
 
