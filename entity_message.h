@@ -1,5 +1,5 @@
 //ENTITY MESAGE - Draw Dialogue Box
-void entity_message (ALLEGRO_BITMAP* tileset, Entity hero, ALLEGRO_FONT* font,vector<vector<Entity>> mve ,vector<int> wid_height) {
+void entity_message (ALLEGRO_BITMAP* tileset, Entity hero, ALLEGRO_FONT* font,vector<vector<Entity>> mve ,int height, int width) {
 	al_draw_bitmap_region(tileset, 0*16,6*16,16,16,16*1,16*25,0);
 	al_draw_bitmap_region(tileset, 2*16,6*16,16,16,16*28,16*25,0);
 

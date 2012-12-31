@@ -29,7 +29,6 @@ class Entity {
 public:
 	int wloc, hloc, frame,sta_frame;
 	int warp_row, warp_col;
-	int corn_seeds, turnip_seeds;
 	int wait_time;
 	char interact,step_on,facing;
 	string dialogue,map_warp;
@@ -48,8 +47,6 @@ void Entity::cleanup() {
 	wloc = NULL;
 	hloc = NULL;
 	frame = NULL;
-	corn_seeds = NULL;
-	turnip_seeds = NULL;
 	sta_frame = NULL;
 	warp_row=NULL;
 	warp_col=NULL;
@@ -62,7 +59,6 @@ void Entity::cleanup() {
 }
 
 Entity Entity::hero_turning(Entity hero, char facing1, vector<vector<Tile>> mv) {
-
 	if (hero.is_swing_hoe == false) {
 					
 		if(hero.facing != facing1) {
@@ -70,7 +66,7 @@ Entity Entity::hero_turning(Entity hero, char facing1, vector<vector<Tile>> mv) 
 			hero.wait_time = 0;
 		}
 
-		else if (hero.can_pass(hero.facing,mv,hero)&& hero.wait_time > 3) {
+		else if (hero.can_pass(hero.facing,mv,hero)&& hero.wait_time > 5) {
 			hero.frame = 1;
 			hero.move_animation = true;
 		}

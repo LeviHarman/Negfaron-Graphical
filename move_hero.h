@@ -39,7 +39,7 @@ ri1,ri2,ri3 row of the three animations
 
 */
 
-Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>> mv, int tw, int aheight, int awidth, vector<int> wid_height, int ci1,int ci2,int ci3,int ri1, int ri2, int ri3) {
+Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>> mv, int tw, int aheight, int awidth, int height, int width, int ci1,int ci2,int ci3,int ri1, int ri2, int ri3) {
 	if(hero.move_animation==true) {
 		int frameintv=0;
 		int frameinth=0;
@@ -65,8 +65,11 @@ Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>
 			break;
 		}
 
-		//Draw Map in motion
-		draw_map(tileset,wid_height,mv,&hero,frameinth,frameintv);
+		for(int col=0;col<height;col++) {
+			for(int row=0;row<width;row++) {
+				al_draw_bitmap_region(tileset, mv[col][row].sx * tw, mv[col][row].sy * tw, tw, tw, (row*tw - hero.wloc*tw)+15*tw+frameinth, (col*tw - hero.hloc*tw)+15*tw+frameintv, 0);
+			}
+		}	
 
 		if (hero.frame<= 2) {
 			al_draw_bitmap_region(tileset, ri2*tw, ci2*tw, tw, tw, 15*tw, 15*tw, 0);
@@ -89,7 +92,7 @@ Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>
 	return hero;
 }
 
-Entity move_hero (Entity hero, ALLEGRO_BITMAP* tileset,vector<vector<Tile>> mv, vector<int> wid_height) {
+Entity move_hero (Entity hero, ALLEGRO_BITMAP* tileset,vector<vector<Tile>> mv,int height,int width) {
 	int tw = 16;
 
 	if(hero.move_animation==false) {
@@ -115,16 +118,16 @@ Entity move_hero (Entity hero, ALLEGRO_BITMAP* tileset,vector<vector<Tile>> mv, 
 	if(hero.is_swing_hoe == false) {
 		switch (hero.facing) {
 		case 'u':
-			hero = walk_animation(hero,tileset,mv,tw,1,1,wid_height,3,3,3,0,1,2);
+			hero = walk_animation(hero,tileset,mv,tw,1,1,height,width,3,3,3,0,1,2);
 			break;
 		case 'd':
-			hero = walk_animation(hero,tileset,mv,tw,1,1,wid_height,2,2,2,0,1,2);
+			hero = walk_animation(hero,tileset,mv,tw,1,1,height,width,2,2,2,0,1,2);
 			break;
 		case 'l':
-			hero = walk_animation(hero,tileset,mv,tw,1,1,wid_height,4,4,4,0,1,2);
+			hero = walk_animation(hero,tileset,mv,tw,1,1,height,width,4,4,4,0,1,2);
 			break;
 		case 'r':
-			hero = walk_animation(hero,tileset,mv,tw,1,1,wid_height,5,5,5,0,1,2);
+			hero = walk_animation(hero,tileset,mv,tw,1,1,height,width,5,5,5,0,1,2);
 			break;
 		}
 	}
