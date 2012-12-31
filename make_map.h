@@ -1,10 +1,10 @@
-vector<vector<Tile>> make_map(int x, int y, string map) {
+vector<vector<Tile>> make_map(vector<int> wid_height, string map) {
 
-	vector<vector<Tile>> mv(x, vector<Tile>(y));
+	vector<vector<Tile>> mv(wid_height[0], vector<Tile>(wid_height[1]));
 	int counter = 0;
 
-	for(int i=0;i<x;i++) {
-		for(int j=0;j<y;j++) {
+	for(int i=0;i<wid_height[0];i++) {
+		for(int j=0;j<wid_height[1];j++) {
 			switch(map[counter]) {
 			case 'X'://Wooden log
 				mv[i][j].set_values('x','n',0,0);
