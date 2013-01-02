@@ -41,7 +41,8 @@ public:
 	void cleanup ();
 	bool can_pass(char,vector<Tile>,Entity);
 	bool action_button; 
-	Entity hero_turning(Entity,char,vector<Tile>);
+	void hero_turning(Entity*,char,vector<Tile>);
+	bool can_interact(Entity,bool,vector<Entity>);
 };
 
 void Entity::cleanup() {
@@ -61,21 +62,52 @@ void Entity::cleanup() {
 	is_swing_hoe = NULL;
 }
 
-Entity Entity::hero_turning(Entity hero, char facing1, vector<Tile> mv) {
+void Entity::hero_turning(Entity * hero, char facing1, vector<Tile> mv) {
 
-	if (hero.is_swing_hoe == false) {
+	if (hero->is_swing_hoe == false) {
 					
-		if(hero.facing != facing1) {
-			hero.facing = facing1;
-			hero.wait_time = 0;
+		if(hero->facing != facing1) {
+			hero->facing = facing1;
+			hero->wait_time = 0;
 		}
 
-		else if (hero.can_pass(hero.facing,mv,hero)&& hero.wait_time > 3) {
-			hero.frame = 1;
-			hero.move_animation = true;
+		else if (hero->can_pass(hero->facing,mv,*hero)&& hero->wait_time > 3) {
+			hero->frame = 1;
+			hero->move_animation = true;
 		}
 	}
-	return hero;
+}
+
+/*
+   can_interact: hvar and wvar are used to convert char facing into
+   a + or - value used to call the .interact function of Hero class
+*/
+bool Entity::can_interact (Entity hero, bool write_dialogue, vector<Entity> mve){
+	bool can_interact = false;
+	int hvar = 0;
+	int wvar = 0;
+
+	switch(hero.facing) {
+	case 'u':
+		hvar = -1;
+		break;
+	case 'd':
+		hvar = 1;
+		break;
+	case 'l':
+		wvar = -1;
+		break;
+	case 'r':
+		wvar = 1;
+		break;
+	}
+
+	if(mve[( (hero.hloc+hvar)*30)+hero.wloc+wvar].interact == 'y') {
+		can_interact = true;
+		write_dialogue = true;
+	}
+
+	return can_interact;
 }
 
 bool Entity::can_pass(char dir, vector<Tile> mv,Entity hero) {
