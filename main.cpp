@@ -11,38 +11,6 @@
 
 enum KEYS{UP,DOWN,LEFT,RIGHT};
 
-/*
-   can_interact: hvar and wvar are used to convert char facing into
-   a + or - value used to call the .interact function of Hero class
-*/
-bool can_interact (Entity * hero, bool write_dialogue, vector<Entity> mve){
-	bool can_interact = false;
-	int hvar = 0;
-	int wvar = 0;
-
-	switch(hero->facing) {
-	case 'u':
-		hvar = -1;
-		break;
-	case 'd':
-		hvar = 1;
-		break;
-	case 'l':
-		wvar = -1;
-		break;
-	case 'r':
-		wvar = 1;
-		break;
-	}
-
-	if(mve[( (hero->hloc+hvar)*30)+hero->wloc+wvar].interact == 'y') {   //mv[( (hero.hloc+1)*30)+hero.wloc] {
-		can_interact = true;
-		write_dialogue = true;
-	}
-
-	return can_interact;
-}
-
 int main(void)
 {
 	/*
@@ -75,7 +43,7 @@ int main(void)
 	/*
 	Integer variables
 	*/
-	int FPS = 30;
+	int FPS = 100;
 
 	/*
 	String variables
@@ -174,7 +142,7 @@ int main(void)
 				if(write_dialogue == true) {
 					write_dialogue = false;
 				}
-				else if (can_interact(hero,write_dialogue,mve) == true){ //neeeds if statement.
+				else if (hero->can_interact(*hero,write_dialogue,mve) == true){ //neeeds if statement.
 					write_dialogue = true;
 				}
 			}
@@ -209,16 +177,16 @@ int main(void)
 		//WAIT UNTIL ANIMATION IS OVER - If key is still pressed animate again. (Pokemon esque)
 		if (hero->move_animation == false) {
 			if (keys[UP]==true) {
-				*hero = hero->hero_turning(*hero,'u',mv);
+				hero->hero_turning(hero,'u',mv);
 			}	
 			else if (keys[DOWN]==true) {
-				*hero = hero->hero_turning(*hero,'d',mv);
+				hero->hero_turning(hero,'d',mv);
 			}
 			else if (keys[LEFT] == true) {
-				*hero = hero->hero_turning(*hero,'l',mv);
+				hero->hero_turning(hero,'l',mv);
 			}
 			else if (keys[RIGHT] == true) {
-				*hero = hero->hero_turning(*hero,'r',mv);
+				hero->hero_turning(hero,'r',mv);
 			}
 		}
 
@@ -250,7 +218,7 @@ int main(void)
 			draw_map(tileset,wid_height,mv,hero,0,0);
 
 			//DRAW & ANIMATE HERO
-			*hero = move_hero(*hero,tileset,mv,wid_height);
+			move_hero(hero,tileset,mv,wid_height);
 
 			//display message
 			if(write_dialogue == true) {
