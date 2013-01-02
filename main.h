@@ -39,9 +39,9 @@ public:
 	void set_warp(string);
 	void set_hero_loc(int,int);
 	void cleanup ();
-	bool can_pass(char,vector<vector<Tile>>,Entity);
+	bool can_pass(char,vector<Tile>,Entity);
 	bool action_button; 
-	Entity hero_turning(Entity,char,vector<vector<Tile>>);
+	Entity hero_turning(Entity,char,vector<Tile>);
 };
 
 void Entity::cleanup() {
@@ -61,7 +61,7 @@ void Entity::cleanup() {
 	is_swing_hoe = NULL;
 }
 
-Entity Entity::hero_turning(Entity hero, char facing1, vector<vector<Tile>> mv) {
+Entity Entity::hero_turning(Entity hero, char facing1, vector<Tile> mv) {
 
 	if (hero.is_swing_hoe == false) {
 					
@@ -78,31 +78,31 @@ Entity Entity::hero_turning(Entity hero, char facing1, vector<vector<Tile>> mv) 
 	return hero;
 }
 
-bool Entity::can_pass(char dir, vector<vector<Tile>> mv,Entity hero) {
+bool Entity::can_pass(char dir, vector<Tile> mv,Entity hero) {
 	switch(dir) {
 	case 'l':
-		if(mv[hero.hloc][hero.wloc-1].pass == 'y') {
+		if(mv[(hero.hloc*30)+hero.wloc-1].pass == 'y') {
 			return true;
 		}
 		else
 			return false;
 		break;
 	case 'r':
-		if(mv[hero.hloc][hero.wloc+1].pass == 'y') {
+		if(mv[(hero.hloc*30)+hero.wloc+1].pass == 'y') {
 			return true;
 		}
 		else
 			return false;
 		break;
 	case 'u':
-		if(mv[hero.hloc-1][hero.wloc].pass == 'y') {
+		if(mv[( (hero.hloc-1)*30)+hero.wloc].pass == 'y') {
 			return true;
 		}
 		else
 			return false;
 		break;
 	case 'd':
-		if(mv[hero.hloc+1][hero.wloc].pass == 'y') {
+		if(mv[( (hero.hloc+1)*30)+hero.wloc].pass == 'y') {
 			return true;
 		}
 		else

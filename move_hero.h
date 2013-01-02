@@ -39,7 +39,7 @@ ri1,ri2,ri3 row of the three animations
 
 */
 
-Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>> mv, int tw, int aheight, int awidth, vector<int> wid_height, int ci1,int ci2,int ci3,int ri1, int ri2, int ri3) {
+Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<Tile> mv, int tw, int aheight, int awidth, vector<int> wid_height, int ci1,int ci2,int ci3,int ri1, int ri2, int ri3) {
 	if(hero.move_animation==true) {
 		int frameintv=0;
 		int frameinth=0;
@@ -77,8 +77,8 @@ Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>
 		else if(hero.frame == 5) {
 			al_draw_bitmap_region(tileset, ri3*tw, ci3*tw, tw, tw, 15*tw, 15*tw, 0);
 			hero.move_animation = false;
-			hero.hloc+=vl;
-			hero.wloc+=hl;
+			hero.hloc+=vl; //moving line.
+			hero.wloc+=hl; // moving line.
 		}
 		hero.frame++;
 	}
@@ -89,7 +89,7 @@ Entity walk_animation (Entity hero, ALLEGRO_BITMAP* tileset, vector<vector<Tile>
 	return hero;
 }
 
-Entity move_hero (Entity hero, ALLEGRO_BITMAP* tileset,vector<vector<Tile>> mv, vector<int> wid_height) {
+Entity move_hero (Entity hero, ALLEGRO_BITMAP* tileset, vector<Tile> mv, vector<int> wid_height) {
 	int tw = 16;
 
 	if(hero.move_animation==false) {

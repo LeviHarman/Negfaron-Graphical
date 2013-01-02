@@ -15,7 +15,7 @@ enum KEYS{UP,DOWN,LEFT,RIGHT};
    can_interact: hvar and wvar are used to convert char facing into
    a + or - value used to call the .interact function of Hero class
 */
-bool can_interact (Entity * hero, bool write_dialogue, vector<vector<Entity>> mve){
+bool can_interact (Entity * hero, bool write_dialogue, vector<Entity> mve){
 	bool can_interact = false;
 	int hvar = 0;
 	int wvar = 0;
@@ -35,7 +35,7 @@ bool can_interact (Entity * hero, bool write_dialogue, vector<vector<Entity>> mv
 		break;
 	}
 
-	if(mve[hero->hloc+hvar][hero->wloc+wvar].interact == 'y') {
+	if(mve[( (hero->hloc+hvar)*30)+hero->wloc+wvar].interact == 'y') {   //mv[( (hero.hloc+1)*30)+hero.wloc] {
 		can_interact = true;
 		write_dialogue = true;
 	}
@@ -95,7 +95,7 @@ int main(void)
 	if(!al_init())
 		return -1;
 
-	display = al_create_display((30*16)-1,(30*16)-1);
+	display = al_create_display((wid_height[0]*16)-1,(wid_height[1]*16)-1);
 
 	if(!display)
 		return -1;
@@ -127,9 +127,9 @@ int main(void)
 
 	al_start_timer(timer);
 
-	vector<vector<Entity>> mve(wid_height[0], vector<Entity>(wid_height[1]));
+	vector<Entity> mve(wid_height[0]*wid_height[1]);
 	init_map_house(cur_map, mve);
-	vector<vector<Tile>> mv = make_map(wid_height,cur_map);
+	vector<Tile> mv = make_map(wid_height,cur_map);
 	init_map_house_entity(mve);
 
 	tileset = al_load_bitmap("tileset.png");
@@ -138,7 +138,7 @@ int main(void)
 
 	//game loop
 	while(!done)
-	{
+	{//
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue,&ev);
 		
@@ -223,16 +223,16 @@ int main(void)
 		}
 
 		//CHECK FOR ON STEP EVENT###################################################################################################
-		if(mve[hero->hloc][hero->wloc].step_on == 'y') {
-			if (mve[hero->hloc][hero->wloc].map_warp == "house") {
-				hero->set_loc(mve[hero->hloc][hero->wloc].warp_col,mve[hero->hloc][hero->wloc].warp_row);
+		if(mve[(hero->hloc*30)+hero->wloc].step_on == 'y') {
+			if (mve[(hero->hloc*30)+hero->wloc].map_warp == "house") {
+				hero->set_loc(mve[(hero->hloc*30)+hero->wloc].warp_col,mve[(hero->hloc*30)+hero->wloc].warp_row);
 				init_map_entity_cleanup(mve);
 				init_map_house_entity(mve);
 				init_map_house(cur_map,mve);
 				mv = make_map(wid_height,cur_map);
 			}
-			else if (mve[hero->hloc][hero->wloc].map_warp == "home") {
-				hero->set_loc(mve[hero->hloc][hero->wloc].warp_col,mve[hero->hloc][hero->wloc].warp_row);
+			else if (mve[(hero->hloc*30)+hero->wloc].map_warp == "home") {
+				hero->set_loc(mve[(hero->hloc*30)+hero->wloc].warp_col,mve[(hero->hloc*30)+hero->wloc].warp_row);
 				init_map_entity_cleanup(mve);
 				init_map_home_entity(mve);
 				init_map_home(cur_map,mve);
