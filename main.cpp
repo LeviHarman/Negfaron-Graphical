@@ -1,13 +1,14 @@
 //Programmed by Levi Harman
 //Date: Started Dec. 2012
 
-#include "main.h"
-#include "maps.h"
-#include "map_entity.h"
-#include "make_map.h"
-#include "draw_map.h"
-#include "move_hero.h"
-#include "entity_message.h"
+#include "neg_headers/main.h"
+#include "neg_headers/creature.h"
+#include "neg_headers/maps.h"
+#include "neg_headers/map_entity.h"
+#include "neg_headers/make_map.h"
+#include "neg_headers/draw_map.h"
+#include "neg_headers/move_hero.h"
+#include "neg_headers/entity_message.h"
 
 enum KEYS{UP,DOWN,LEFT,RIGHT};
 
@@ -53,7 +54,7 @@ int main(void)
 	/*
 	Object variables
 	*/
-	Entity * hero = new Entity;
+	Creature * hero = new Creature;
 	hero->set_loc(12,15);
 	hero->facing = 'd';
 	hero->is_swing_hoe = false;
@@ -83,8 +84,8 @@ int main(void)
 	/*
 	Initialize allegro variables.
 	*/
-	sample = al_load_sample("collision.ogg");
-	font = al_load_font("arial.ttf",16,0);
+	sample = al_load_sample("neg_resources/collision.ogg");
+	font = al_load_font("neg_resources/arial.ttf",16,0);
 	timer = al_create_timer(1.0/FPS);
 	event_queue = al_create_event_queue();
 
@@ -100,13 +101,13 @@ int main(void)
 	vector<Tile> mv = make_map(wid_height,cur_map);
 	init_map_house_entity(mve);
 
-	tileset = al_load_bitmap("tileset.png");
+	tileset = al_load_bitmap("neg_resources/tileset.png");
 	al_convert_mask_to_alpha(tileset, al_map_rgb(0,255,255));
 
 
 	//game loop
 	while(!done)
-	{//
+	{
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue,&ev);
 		
@@ -142,7 +143,7 @@ int main(void)
 				if(write_dialogue == true) {
 					write_dialogue = false;
 				}
-				else if (hero->can_interact(*hero,write_dialogue,mve) == true){ //neeeds if statement.
+				else if (hero->can_interact(write_dialogue,mve) == true){ //neeeds if statement.
 					write_dialogue = true;
 				}
 			}
@@ -177,20 +178,20 @@ int main(void)
 		//WAIT UNTIL ANIMATION IS OVER - If key is still pressed animate again. (Pokemon esque)
 		if (hero->move_animation == false) {
 			if (keys[UP]==true) {
-				hero->hero_turning(hero,'u',mv);
+				hero->creature_turning('u',mv);
 			}	
 			else if (keys[DOWN]==true) {
-				hero->hero_turning(hero,'d',mv);
+				hero->creature_turning('d',mv);
 			}
 			else if (keys[LEFT] == true) {
-				hero->hero_turning(hero,'l',mv);
+				hero->creature_turning('l',mv);
 			}
 			else if (keys[RIGHT] == true) {
-				hero->hero_turning(hero,'r',mv);
+				hero->creature_turning('r',mv);
 			}
 		}
 
-		//CHECK FOR ON STEP EVENT###################################################################################################
+		//CHECK FOR ON STEP EVENT
 		if(mve[(hero->hloc*30)+hero->wloc].step_on == 'y') {
 			if (mve[(hero->hloc*30)+hero->wloc].map_warp == "house") {
 				hero->set_loc(mve[(hero->hloc*30)+hero->wloc].warp_col,mve[(hero->hloc*30)+hero->wloc].warp_row);
@@ -222,7 +223,7 @@ int main(void)
 
 			//display message
 			if(write_dialogue == true) {
-				entity_message(tileset,*hero,font,mve,wid_height);
+				entity_message(tileset,hero,font,mve,wid_height);
 			}
 			
 			al_flip_display();
