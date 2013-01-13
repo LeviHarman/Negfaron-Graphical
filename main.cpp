@@ -47,6 +47,12 @@ int main(void)
 	int FPS = 100;
 
 	/*
+	Timing variables
+	*/
+	time_t timer1 = clock();
+	int frame_counter = 0; 
+
+	/*
 	String variables
 	*/
 	string cur_map;
@@ -54,12 +60,12 @@ int main(void)
 	/*
 	Object variables
 	*/
-	Creature * hero = new Creature;
-	hero->set_loc(12,15);
-	hero->facing = 'd';
-	hero->is_swing_hoe = false;
-	hero->move_animation = false;
-	hero->wait_time=1;
+	Creature hero;
+	hero.set_loc(12,15);
+	hero.facing = 'd';
+	hero.is_swing_hoe = false;
+	hero.move_animation = false;
+	hero.wait_time=1;
 	
 	if(!al_init())
 		return -1;
@@ -134,16 +140,16 @@ int main(void)
 				keys[LEFT]=true;
 				break;
 			case ALLEGRO_KEY_RCTRL:
-				if (hero->move_animation == false && hero->is_swing_hoe == false) {
-					hero->sta_frame = 1;
-					hero->is_swing_hoe = true;
+				if (hero.move_animation == false && hero.is_swing_hoe == false) {
+					hero.sta_frame = 1;
+					hero.is_swing_hoe = true;
 				}
 				break;
 			case ALLEGRO_KEY_Z:
 				if(write_dialogue == true) {
 					write_dialogue = false;
 				}
-				else if (hero->can_interact(write_dialogue,mve) == true){ //neeeds if statement.
+				else if (hero.can_interact(write_dialogue,mve) == true){ //neeeds if statement.
 					write_dialogue = true;
 				}
 			}
@@ -176,32 +182,32 @@ int main(void)
 		}
 
 		//WAIT UNTIL ANIMATION IS OVER - If key is still pressed animate again. (Pokemon esque)
-		if (hero->move_animation == false) {
+		if (hero.move_animation == false) {
 			if (keys[UP]==true) {
-				hero->creature_turning('u',mv);
+				hero.creature_turning('u',mv);
 			}	
 			else if (keys[DOWN]==true) {
-				hero->creature_turning('d',mv);
+				hero.creature_turning('d',mv);
 			}
 			else if (keys[LEFT] == true) {
-				hero->creature_turning('l',mv);
+				hero.creature_turning('l',mv);
 			}
 			else if (keys[RIGHT] == true) {
-				hero->creature_turning('r',mv);
+				hero.creature_turning('r',mv);
 			}
 		}
 
 		//CHECK FOR ON STEP EVENT
-		if(mve[(hero->hloc*30)+hero->wloc].step_on == 'y') {
-			if (mve[(hero->hloc*30)+hero->wloc].map_warp == "house") {
-				hero->set_loc(mve[(hero->hloc*30)+hero->wloc].warp_col,mve[(hero->hloc*30)+hero->wloc].warp_row);
+		if(mve[(hero.hloc*30)+hero.wloc].step_on == 'y') {
+			if (mve[(hero.hloc*30)+hero.wloc].map_warp == "house") {
+				hero.set_loc(mve[(hero.hloc*30)+hero.wloc].warp_col,mve[(hero.hloc*30)+hero.wloc].warp_row);
 				init_map_entity_cleanup(mve);
 				init_map_house_entity(mve);
 				init_map_house(cur_map,mve);
 				mv = make_map(wid_height,cur_map);
 			}
-			else if (mve[(hero->hloc*30)+hero->wloc].map_warp == "home") {
-				hero->set_loc(mve[(hero->hloc*30)+hero->wloc].warp_col,mve[(hero->hloc*30)+hero->wloc].warp_row);
+			else if (mve[(hero.hloc*30)+hero.wloc].map_warp == "home") {
+				hero.set_loc(mve[(hero.hloc*30)+hero.wloc].warp_col,mve[(hero.hloc*30)+hero.wloc].warp_row);
 				init_map_entity_cleanup(mve);
 				init_map_home_entity(mve);
 				init_map_home(cur_map,mve);
@@ -209,7 +215,7 @@ int main(void)
 			}
 		}
 
-		hero->wait_time++;
+		hero.wait_time++;
 		//This block runs 60 times per second
 		if(redraw && al_is_event_queue_empty(event_queue))
 		{
@@ -219,6 +225,12 @@ int main(void)
 			draw_map(tileset,wid_height,mv,hero,0,0);
 
 			//DRAW & ANIMATE HERO
+			frame_counter++;
+			if ((clock() - timer1) >= 1000) {
+				cout<<frame_counter<<"\n";
+				frame_counter = 0;
+				timer1 = clock();
+			}
 			move_hero(hero,tileset,mv,wid_height);
 
 			//display message
@@ -241,7 +253,6 @@ int main(void)
 	al_destroy_font(font);
 	al_destroy_event_queue(event_queue);
 	al_destroy_timer (timer);
-	delete hero;
 
 	return 0;
 }
