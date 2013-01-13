@@ -5,16 +5,16 @@ public:
 	int wait_time;
 	bool move_animation, is_swing_hoe;
 	char facing;
-	bool can_interact(bool,vector<Entity>);
-	bool can_pass(char,vector<Tile>);
-	void creature_turning(char,vector<Tile>);
+	bool can_interact(bool,vector<Entity>&);
+	bool can_pass(char,vector<Tile>&);
+	void creature_turning(char,vector<Tile>&);
 };
 
 /*
    can_interact: hvar and wvar are used to convert char facing into
    a + or - value used to call the .interact function of Hero class
 */
-bool Creature::can_interact (bool write_dialogue, vector<Entity> mve){
+bool Creature::can_interact (bool write_dialogue, vector<Entity> &mve){
 	bool can_interact = false;
 	int hvar = 0;
 	int wvar = 0;
@@ -42,7 +42,7 @@ bool Creature::can_interact (bool write_dialogue, vector<Entity> mve){
 	return can_interact;
 }
 
-void Creature::creature_turning(char facing1, vector<Tile> mv) {
+void Creature::creature_turning(char facing1, vector<Tile> &mv) {
 
 	if (is_swing_hoe == false) {
 					
@@ -58,7 +58,7 @@ void Creature::creature_turning(char facing1, vector<Tile> mv) {
 	}
 }
 
-bool Creature::can_pass(char dir, vector<Tile> mv) {
+bool Creature::can_pass(char dir, vector<Tile> &mv) {
 	switch(dir) {
 	case 'l':
 		if(mv[(hloc*30)+wloc-1].pass == 'y') {
